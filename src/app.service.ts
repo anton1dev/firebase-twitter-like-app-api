@@ -10,4 +10,8 @@ export class AppService {
   getId(): string {
     return `Your new ID is: ${randomUUID()}`;
   }
+
+  getPath(): string {
+    return process.env.CLIENT_CERT_URL ?? 'Error!';
+  }
 }

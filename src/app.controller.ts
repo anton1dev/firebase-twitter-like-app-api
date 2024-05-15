@@ -14,4 +14,9 @@ export class AppController {
   getId(): string {
     return this.appService.getId();
   }
+
+  @Get('/path')
+  getPath(): string {
+    return this.appService.getPath();
+  }
 }
