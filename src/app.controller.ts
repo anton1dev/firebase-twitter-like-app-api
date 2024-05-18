@@ -9,14 +9,4 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-
-  @Get('/id')
-  getId(): string {
-    return this.appService.getId();
-  }
-
-  @Get('/path')
-  getPath(): string {
-    return this.appService.getPath();
-  }
 }

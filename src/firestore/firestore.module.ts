@@ -5,8 +5,6 @@ import {
   FirestoreOptionsProvider,
   FirestoreCollectionProviders,
 } from './firestore.providers';
-import { FirestoreController } from './firestore.controller';
-import { FirestoreService } from './firestore.service';
 
 type FirestoreModuleOptions = {
   imports: any[];
@@ -14,10 +12,7 @@ type FirestoreModuleOptions = {
   inject: any[];
 };
 
-@Module({
-  providers: [FirestoreService],
-  controllers: [FirestoreController],
-})
+@Module({})
 export class FirestoreModule {
   static forRoot(options: FirestoreModuleOptions): DynamicModule {
     const optionsProvider = {

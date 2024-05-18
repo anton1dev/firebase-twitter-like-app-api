@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
-import { FirebaseModule } from './firebase/firebase.module';
 import { FirestoreModule } from './firestore/firestore.module';
 import { UsersModule } from './users/users.module';
 
@@ -19,9 +18,7 @@ import { UsersModule } from './users/users.module';
     }),
     PostsModule,
     UsersModule,
-    FirebaseModule,
     FirestoreModule,
-    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
