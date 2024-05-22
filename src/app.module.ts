@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { PostsModule } from './posts/posts.module';
+import { PostModule } from './post/post.module';
 import { FirestoreModule } from './firestore/firestore.module';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -16,8 +16,8 @@ import { UsersModule } from './users/users.module';
       }),
       inject: [ConfigService],
     }),
-    PostsModule,
-    UsersModule,
+    UserModule,
+    PostModule,
     FirestoreModule,
   ],
   controllers: [AppController],

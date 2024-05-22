@@ -1,4 +1,4 @@
-export class UsersDocument {
+export class UserDocument {
   static collectionName = 'users';
 
   id?: string;
