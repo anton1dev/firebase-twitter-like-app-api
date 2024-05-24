@@ -1,73 +1,59 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserDocument } from './user.document';
-import { CollectionReference } from '@google-cloud/firestore';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject(UserDocument.collectionName)
-    private userCollection: CollectionReference<UserDocument>,
-  ) {}
+  constructor(private userRepository: UserRepository) {}
 
   async findAll(): Promise<UserDocument[]> {
-    const snapshot = await this.userCollection.get();
-    const users: UserDocument[] = [];
-    snapshot.forEach((doc) => users.push({ id: doc.id, ...doc.data() }));
-
-    return users;
+    return await this.userRepository.getAll();
   }
 
-  async getUser(userId: string): Promise<UserDocument> {
-    const user = await this.userCollection.doc(userId).get();
-    if (!user.exists) {
-      throw new Error('User not found!');
+  async getUserById(userId: string): Promise<UserDocument> {
+    const user = this.userRepository.getOneById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
     }
 
-    return user.data();
+    return user;
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<UserDocument> {
-    const { nickname, email } = createUserDto;
+    const { nickname, email, password } = createUserDto;
     const newUser: Omit<UserDocument, 'id'> = {
       nickname,
       email,
+      password,
       following: [],
       posts: [],
     };
 
-    const userRef = await this.userCollection.add(newUser);
-
-    return {
-      id: userRef.id,
-      ...newUser,
-    };
+    return await this.userRepository.create(newUser);
   }
 
   async updateUser(
     userId: string,
     updateUserDto: UpdateUserDto,
   ): Promise<void> {
-    const user = await this.userCollection.doc(userId).get();
+    const user = await this.userRepository.getOneById(userId);
 
-    if (!user.exists) {
-      throw new Error('User not found!');
+    if (!user) {
+      throw new NotFoundException('User not found!');
     }
 
-    const updatedData = {
-      ...updateUserDto,
-    };
-
-    await this.userCollection.doc(userId).update(updatedData);
+    return this.userRepository.update(userId, updateUserDto);
   }
 
   async deleteUser(userId: string): Promise<void> {
-    const user = await this.userCollection.doc(userId).get();
-    if (!user.exists) {
+    const user = await this.userRepository.getOneById(userId);
+    if (!user) {
       throw new Error('User not found!');
     }
 
-    await this.userCollection.doc(userId).delete();
+    await this.userRepository.delete(userId);
   }
 }

@@ -5,6 +5,7 @@ export class UserDocument {
 
   nickname: string;
   email: string;
+  password: string;
   following: string[];
   posts: string[];
 }

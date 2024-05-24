@@ -1,58 +1,59 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { PostDocument } from './post.document';
-import { CollectionReference } from '@google-cloud/firestore';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { UserDocument } from 'src/user/user.document';
+import { PostRepository } from './post.repository';
+import { UserRepository } from 'src/user/user.repository';
 
 @Injectable()
 export class PostService {
   constructor(
-    @Inject(PostDocument.collectionName)
-    private postCollection: CollectionReference<PostDocument>,
-    @Inject(UserDocument.collectionName)
-    private userCollection: CollectionReference<UserDocument>,
+    private readonly postRepository: PostRepository,
+    @Inject(forwardRef(() => UserRepository))
+    private readonly userRepository: UserRepository,
   ) {}
 
   async getAllPosts(): Promise<PostDocument[]> {
-    const snapshot = await this.postCollection.get();
-    const posts: PostDocument[] = [];
-    snapshot.forEach((post) => posts.push({ id: post.id, ...post.data() }));
-
-    return posts;
+    return await this.postRepository.getAll();
   }
 
   async getPostsByUserId(userId: string): Promise<PostDocument[]> {
-    const snapshot = await this.postCollection
-      .where('authorId', '==', userId)
-      .get();
-    const posts: PostDocument[] = [];
+    const user = await this.userRepository.getOneById(userId);
 
-    snapshot.forEach((post) =>
-      posts.push({
-        id: post.id,
-        ...post.data(),
-      }),
-    );
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
 
-    return posts;
+    return this.postRepository.getAllByUserId(userId);
   }
 
   async getPostByPostId(postId: string): Promise<PostDocument> {
-    const post = await this.postCollection.doc(postId).get();
+    const post = await this.postRepository.getOneByPostId(postId);
 
-    if (!post.exists) {
-      throw new Error('Post doesnt exist!');
+    if (!post) {
+      throw new NotFoundException('Post doesnt exist!');
     }
 
-    return post.data();
+    return post;
   }
 
   async createPost(createPostDto: CreatePostDto): Promise<PostDocument> {
-    const { text, mediaUrl, authorId } = createPostDto;
+    const { title, text, mediaUrl, authorId } = createPostDto;
+    const user = this.userRepository.getOneById(authorId);
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
     const currentDate = new Date();
 
     const newPost: Omit<PostDocument, 'id'> = {
+      title,
       text,
       authorId,
       createdAt: currentDate,
@@ -61,63 +62,51 @@ export class PostService {
       mediaUrl: mediaUrl ? mediaUrl : null,
     };
 
-    const postRef = await this.postCollection.add(newPost as PostDocument);
-
-    return {
-      id: postRef.id,
-      ...newPost,
-    };
+    return this.postRepository.create(newPost);
   }
 
   async updatePost(
     postId: string,
     updatePostDto: UpdatePostDto,
   ): Promise<void> {
-    const postToUpdate = await this.postCollection.doc(postId).get();
+    const postToUpdate = await this.postRepository.getOneByPostId(postId);
 
-    if (!postToUpdate.exists) {
-      throw new Error('Post not found!');
+    if (!postToUpdate) {
+      throw new NotFoundException('Post not found!');
     }
 
-    const updatedPost = {
-      ...updatePostDto,
-    };
-
-    await this.postCollection.doc(postId).update(updatedPost);
+    await this.postRepository.update(postId, updatePostDto);
   }
 
   async deletePost(postId: string): Promise<void> {
-    const postToDelete = await this.postCollection.doc(postId).get();
+    const postToDelete = await this.postRepository.getOneByPostId(postId);
 
-    if (!postToDelete.exists) {
-      throw new Error('Post not found!');
+    if (!postToDelete) {
+      throw new NotFoundException('Post not found!');
     }
 
-    await this.postCollection.doc(postId).delete();
+    await this.postRepository.delete(postId);
   }
 
   async likePost(userId: string, postId: string): Promise<void> {
-    const post = await this.postCollection.doc(postId).get();
+    const post = await this.postRepository.getOneByPostId(postId);
 
-    if (!post.exists) {
-      throw new Error('Post not found!');
+    if (!post) {
+      throw new NotFoundException('Post not found!');
     }
 
-    const user = await this.userCollection.doc(userId).get();
+    const user = await this.userRepository.getOneById(userId);
 
-    if (!user.exists) {
-      throw new Error('User with that ID was not found!');
+    if (!user) {
+      throw new NotFoundException('User with that ID was not found!');
     }
 
-    const likes = post.data().likes;
-    let newLikes: string[] = [];
+    const likes = (await this.postRepository.getOneByPostId(postId)).likes;
 
     if (likes.includes(userId)) {
-      newLikes = likes.filter((id) => id !== userId);
+      return this.postRepository.removeLike(postId, userId);
     } else {
-      newLikes = [...likes, userId];
+      return this.postRepository.addLike(postId, userId);
     }
-
-    await this.postCollection.doc(postId).update({ likes: newLikes });
   }
 }

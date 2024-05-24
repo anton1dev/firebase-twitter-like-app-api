@@ -6,6 +6,7 @@ import { PostModule } from './post/post.module';
 import { FirestoreModule } from './firestore/firestore.module';
 import { UserModule } from './user/user.module';
 import { serviceAccountPath } from './config/firebase.config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { serviceAccountPath } from './config/firebase.config';
     UserModule,
     PostModule,
     FirestoreModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
