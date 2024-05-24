@@ -7,6 +7,7 @@ export class PostDocument {
   authorId: string;
   createdAt: Date;
   updatedAt: Date;
-  likes: string[];
+  likes?: string[] = [];
+  dislikes?: string[] = [];
   mediaUrl?: string;
 }

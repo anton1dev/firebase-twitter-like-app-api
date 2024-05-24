@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { PostDocument } from './post.document';
 import { CollectionReference } from '@google-cloud/firestore';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { UserDocument } from 'src/user/user.document';
 
 @Injectable()
 export class PostRepository {
@@ -63,5 +62,23 @@ export class PostRepository {
     const filteredLikes = prevLikes.filter((like) => like !== userId);
 
     await this.postCollection.doc(postId).update({ likes: filteredLikes });
+  }
+
+  async addDislike(postId: string, userId: string): Promise<void> {
+    const prevDislikes = (await this.postCollection.doc(postId).get()).data()
+      .dislikes;
+    prevDislikes.push(userId);
+
+    await this.postCollection.doc(postId).update({ dislikes: prevDislikes });
+  }
+
+  async removeDislike(postId: string, userId: string): Promise<void> {
+    const prevDislikes = (await this.postCollection.doc(postId).get()).data()
+      .dislikes;
+    const filteredDislikes = prevDislikes.filter((like) => like !== userId);
+
+    await this.postCollection
+      .doc(postId)
+      .update({ dislikes: filteredDislikes });
   }
 }

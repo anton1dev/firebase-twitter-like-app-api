@@ -12,6 +12,7 @@ import { PostDocument } from './post.document';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { LikePostDto } from './dto/like-post.dto';
+import { DislikePostDto } from './dto/dislike-post.dto';
 
 @Controller('posts')
 export class PostController {
@@ -63,5 +64,14 @@ export class PostController {
   ): Promise<void> {
     const { userId } = likePostDto;
     return this.postService.likePost(userId, postId);
+  }
+
+  @Patch('dislike/:postId')
+  async dislikePost(
+    @Param('postId') postId: string,
+    @Body() dislikePostDto: DislikePostDto,
+  ): Promise<void> {
+    const { userId } = dislikePostDto;
+    return this.postService.dislikePost(userId, postId);
   }
 }

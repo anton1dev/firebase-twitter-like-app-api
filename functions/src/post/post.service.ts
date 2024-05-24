@@ -58,7 +58,6 @@ export class PostService {
       authorId,
       createdAt: currentDate,
       updatedAt: currentDate,
-      likes: [],
       mediaUrl: mediaUrl ? mediaUrl : null,
     };
 
@@ -101,12 +100,46 @@ export class PostService {
       throw new NotFoundException('User with that ID was not found!');
     }
 
-    const likes = (await this.postRepository.getOneByPostId(postId)).likes;
+    const { likes, dislikes } = post;
+
+    if (dislikes.includes(userId)) {
+      this.postRepository.removeDislike(postId, userId);
+
+      return this.postRepository.addLike(postId, userId);
+    }
 
     if (likes.includes(userId)) {
       return this.postRepository.removeLike(postId, userId);
     } else {
       return this.postRepository.addLike(postId, userId);
+    }
+  }
+
+  async dislikePost(userId: string, postId: string): Promise<void> {
+    const post = await this.postRepository.getOneByPostId(postId);
+
+    if (!post) {
+      throw new NotFoundException('Post not found!');
+    }
+
+    const user = await this.userRepository.getOneById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User with that ID was not found!');
+    }
+
+    const { likes, dislikes } = post;
+
+    if (likes.includes(userId)) {
+      this.postRepository.removeLike(postId, userId);
+
+      return this.postRepository.addDislike(postId, userId);
+    }
+
+    if (dislikes.includes(userId)) {
+      return this.postRepository.removeDislike(postId, userId);
+    } else {
+      return this.postRepository.addDislike(postId, userId);
     }
   }
 }
