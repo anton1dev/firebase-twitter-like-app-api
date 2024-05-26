@@ -19,21 +19,20 @@ export class UserRepository {
     return (await this.userCollection.doc(userId).get()).data();
   }
 
-  async create(newUser: Omit<UserDocument, 'id'>): Promise<UserDocument> {
-    const userRef = await this.userCollection.add(newUser);
+  async create(newUser: UserDocument): Promise<UserDocument> {
+    await this.userCollection.doc(newUser.id).set(newUser);
 
-    return {
-      id: userRef.id,
-      ...newUser,
-    };
+    return newUser;
   }
 
-  async update(userId: string, updateUserDto: UpdateUserDto): Promise<void> {
+  async update(userId: string, updateUserDto: UpdateUserDto): Promise<string> {
     const updatedUserData = {
       ...updateUserDto,
     };
 
     await this.userCollection.doc(userId).update(updatedUserData);
+
+    return userId;
   }
 
   async delete(userId: string): Promise<void> {

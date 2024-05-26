@@ -23,12 +23,13 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<UserDocument> {
-    const { nickname, email, password } = createUserDto;
-    const newUser: Omit<UserDocument, 'id'> = {
+    const { id, nickname, email, name, surname } = createUserDto;
+    const newUser: UserDocument = {
+      id,
       nickname,
+      name,
+      surname,
       email,
-      password,
-      following: [],
       posts: [],
     };
 
@@ -38,7 +39,7 @@ export class UserService {
   async updateUser(
     userId: string,
     updateUserDto: UpdateUserDto,
-  ): Promise<void> {
+  ): Promise<string> {
     const user = await this.userRepository.getOneById(userId);
 
     if (!user) {
@@ -48,12 +49,14 @@ export class UserService {
     return this.userRepository.update(userId, updateUserDto);
   }
 
-  async deleteUser(userId: string): Promise<void> {
+  async deleteUser(userId: string): Promise<string> {
     const user = await this.userRepository.getOneById(userId);
     if (!user) {
       throw new Error('User not found!');
     }
 
     await this.userRepository.delete(userId);
+
+    return userId;
   }
 }
