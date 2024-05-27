@@ -8,5 +8,7 @@ export class UserDocument {
   surname: string;
   email: string;
 
+  photo?: string;
+
   posts: string[];
 }

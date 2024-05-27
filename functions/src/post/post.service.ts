@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -9,6 +10,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostRepository } from './post.repository';
 import { UserRepository } from 'src/user/user.repository';
+import { UserDocument } from 'src/user/user.document';
 
 @Injectable()
 export class PostService {
@@ -18,8 +20,11 @@ export class PostService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async getAllPosts(): Promise<PostDocument[]> {
-    return await this.postRepository.getAll();
+  async getAllPosts(
+    page: string = '1',
+    limit: string = '20',
+  ): Promise<PostDocument[]> {
+    return await this.postRepository.getAll(page, limit);
   }
 
   async getPostsByUserId(userId: string): Promise<PostDocument[]> {
@@ -42,22 +47,28 @@ export class PostService {
     return post;
   }
 
-  async createPost(createPostDto: CreatePostDto): Promise<PostDocument> {
-    const { title, text, mediaUrl, authorId } = createPostDto;
-    const user = this.userRepository.getOneById(authorId);
+  async getPostsFromSearchQuery(query: string): Promise<PostDocument[]> {
+    const preparedQuery = query.toLowerCase().trim();
 
-    if (!user) {
-      throw new NotFoundException('User not found!');
-    }
+    return await this.postRepository.getPostsFromSearchQuery(preparedQuery);
+  }
+
+  async createPost(
+    createPostDto: CreatePostDto,
+    user: UserDocument,
+  ): Promise<PostDocument> {
+    const { title, text, mediaUrl } = createPostDto;
 
     const currentDate = new Date();
 
     const newPost: Omit<PostDocument, 'id'> = {
       title,
       text,
-      authorId,
+      authorId: user.id,
       createdAt: currentDate,
-      updatedAt: currentDate,
+      likesScore: 0,
+      likes: [],
+      dislikes: [],
       mediaUrl: mediaUrl ? mediaUrl : null,
     };
 
@@ -67,8 +78,13 @@ export class PostService {
   async updatePost(
     postId: string,
     updatePostDto: UpdatePostDto,
+    user: UserDocument,
   ): Promise<void> {
     const postToUpdate = await this.postRepository.getOneByPostId(postId);
+
+    if (postToUpdate.authorId !== user.id) {
+      throw new ForbiddenException('This user cant update this post!');
+    }
 
     if (!postToUpdate) {
       throw new NotFoundException('Post not found!');
@@ -77,9 +93,12 @@ export class PostService {
     await this.postRepository.update(postId, updatePostDto);
   }
 
-  async deletePost(postId: string): Promise<void> {
+  async deletePost(postId: string, user: UserDocument): Promise<void> {
     const postToDelete = await this.postRepository.getOneByPostId(postId);
 
+    if (postToDelete.authorId !== user.id) {
+      throw new ForbiddenException('This user cant delete this post!');
+    }
     if (!postToDelete) {
       throw new NotFoundException('Post not found!');
     }

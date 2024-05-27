@@ -104,6 +104,7 @@ export class AuthService {
     try {
       await this.firebaseService.deleteUser(userId);
       await this.userService.deleteUser(userId);
+      await this.logout();
     } catch (error) {
       throw new Error('Error while deleting user');
     }

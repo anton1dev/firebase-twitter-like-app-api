@@ -6,8 +6,8 @@ export class PostDocument {
   text: string;
   authorId: string;
   createdAt: Date;
-  updatedAt: Date;
   likes?: string[] = [];
+  likesScore: number = 0;
   dislikes?: string[] = [];
   mediaUrl?: string;
 }

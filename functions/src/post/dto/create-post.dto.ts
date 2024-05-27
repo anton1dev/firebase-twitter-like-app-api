@@ -9,9 +9,6 @@ export class CreatePostDto {
   @IsNotEmpty()
   title: string;
 
-  @IsNotEmpty()
-  authorId: string;
-
   @IsUrl()
   mediaUrl?: string;
 }
