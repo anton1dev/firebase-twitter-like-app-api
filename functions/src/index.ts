@@ -3,7 +3,6 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import * as express from 'express';
 import * as functions from 'firebase-functions';
 import { AppModule } from './app.module';
-import dotenv from 'dotenv';
 
 const expressServer = express();
 const createFunction = async (expressInstance): Promise<void> => {

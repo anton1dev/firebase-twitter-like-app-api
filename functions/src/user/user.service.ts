@@ -13,7 +13,7 @@ export class UserService {
   }
 
   async getUserById(userId: string): Promise<UserDocument> {
-    const user = this.userRepository.getOneById(userId);
+    const user = await this.userRepository.getOneById(userId);
 
     if (!user) {
       throw new NotFoundException('User not found!');

@@ -75,4 +75,8 @@ export class FirebaseService {
   async logOutUser(): Promise<void> {
     return await this.getClientAuth().signOut();
   }
+
+  async deleteUser(userId: string): Promise<void> {
+    return await this.getAdminAuth().deleteUser(userId);
+  }
 }
