@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { serviceAccountPath } from './config/firebase.config';
 import { AuthModule } from './auth/auth.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { FirebaseModule } from './firebase/firebase.module';
     AuthModule,
     UserModule,
     PostModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

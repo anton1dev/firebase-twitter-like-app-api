@@ -67,6 +67,7 @@ export class PostService {
       authorId: user.id,
       createdAt: currentDate,
       likesScore: 0,
+      commentsScore: 0,
       likes: [],
       dislikes: [],
       mediaUrl: mediaUrl ? mediaUrl : null,
@@ -82,12 +83,12 @@ export class PostService {
   ): Promise<void> {
     const postToUpdate = await this.postRepository.getOneByPostId(postId);
 
-    if (postToUpdate.authorId !== user.id) {
-      throw new ForbiddenException('This user cant update this post!');
-    }
-
     if (!postToUpdate) {
       throw new NotFoundException('Post not found!');
+    }
+
+    if (postToUpdate.authorId !== user.id) {
+      throw new ForbiddenException('This user cant update this post!');
     }
 
     await this.postRepository.update(postId, updatePostDto);
@@ -96,11 +97,12 @@ export class PostService {
   async deletePost(postId: string, user: UserDocument): Promise<void> {
     const postToDelete = await this.postRepository.getOneByPostId(postId);
 
-    if (postToDelete.authorId !== user.id) {
-      throw new ForbiddenException('This user cant delete this post!');
-    }
     if (!postToDelete) {
       throw new NotFoundException('Post not found!');
+    }
+
+    if (postToDelete.authorId !== user.id) {
+      throw new ForbiddenException('This user cant delete this post!');
     }
 
     await this.postRepository.delete(postId);

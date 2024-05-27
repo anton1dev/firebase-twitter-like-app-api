@@ -54,7 +54,7 @@ export class PostController {
   @Post()
   async createPost(
     @Body() createPostDto: CreatePostDto,
-    @CurrentUser() user,
+    @CurrentUser() user: UserDocument,
   ): Promise<PostDocument> {
     return this.postService.createPost(createPostDto, user);
   }
@@ -64,7 +64,7 @@ export class PostController {
   async updatePost(
     @Param('postId') postId: string,
     @Body() updatePostDto: UpdatePostDto,
-    @CurrentUser() user,
+    @CurrentUser() user: UserDocument,
   ): Promise<void> {
     return this.postService.updatePost(postId, updatePostDto, user);
   }
@@ -73,7 +73,7 @@ export class PostController {
   @Delete(':postId')
   async deletePost(
     @Param('postId') postId: string,
-    @CurrentUser() user,
+    @CurrentUser() user: UserDocument,
   ): Promise<void> {
     return this.postService.deletePost(postId, user);
   }

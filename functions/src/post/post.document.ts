@@ -6,6 +6,7 @@ export class PostDocument {
   text: string;
   authorId: string;
   createdAt: Date;
+  commentsScore: number = 0;
   likes?: string[] = [];
   likesScore: number = 0;
   dislikes?: string[] = [];

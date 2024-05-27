@@ -2,7 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { PostDocument } from './post.document';
 import { CollectionReference } from '@google-cloud/firestore';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { query, where } from 'firebase/firestore';
+import { firestore } from 'firebase-admin';
+
 @Injectable()
 export class PostRepository {
   constructor(
@@ -79,15 +80,28 @@ export class PostRepository {
     await this.postCollection.doc(postId).delete();
   }
 
-  async updateLikesScore(postId: string): Promise<number> {
-    const post = (await this.postCollection.doc(postId).get()).data();
+  async updateLikesScore(postId: string, payload: number): Promise<number> {
+    await this.postCollection.doc(postId).update({
+      likesScore: firestore.FieldValue.increment(payload),
+    });
 
-    const likesCount = post.likes ? post.likes.length : 0;
-    const dislikesCount = post.dislikes ? post.dislikes.length : 0;
-    const likesScore = likesCount - dislikesCount;
+    const updatedLikesScore = (
+      await this.postCollection.doc(postId).get()
+    ).data().likesScore;
 
-    await this.postCollection.doc(postId).update({ likesScore });
-    return likesScore;
+    return updatedLikesScore;
+  }
+
+  async updateCommentsScore(postId: string, payload: number): Promise<number> {
+    await this.postCollection.doc(postId).update({
+      commentsScore: firestore.FieldValue.increment(payload),
+    });
+
+    const updatedCommentsScore = (
+      await this.postCollection.doc(postId).get()
+    ).data().commentsScore;
+
+    return updatedCommentsScore;
   }
 
   async addLike(postId: string, userId: string): Promise<void> {
@@ -97,7 +111,7 @@ export class PostRepository {
 
     await this.postCollection.doc(postId).update({ likes: prevLikes });
 
-    await this.updateLikesScore(postId);
+    await this.updateLikesScore(postId, 1);
   }
 
   async removeLike(postId: string, userId: string): Promise<void> {
@@ -107,7 +121,7 @@ export class PostRepository {
 
     await this.postCollection.doc(postId).update({ likes: filteredLikes });
 
-    await this.updateLikesScore(postId);
+    await this.updateLikesScore(postId, -1);
   }
 
   async addDislike(postId: string, userId: string): Promise<void> {
@@ -116,7 +130,7 @@ export class PostRepository {
     prevDislikes.push(userId);
 
     await this.postCollection.doc(postId).update({ dislikes: prevDislikes });
-    await this.updateLikesScore(postId);
+    await this.updateLikesScore(postId, -1);
   }
 
   async removeDislike(postId: string, userId: string): Promise<void> {
@@ -128,6 +142,6 @@ export class PostRepository {
       .doc(postId)
       .update({ dislikes: filteredDislikes });
 
-    await this.updateLikesScore(postId);
+    await this.updateLikesScore(postId, 1);
   }
 }
