@@ -7,6 +7,9 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { RegisterDto } from './dtos/register-dto';
 import { GoogleRegisterUser } from 'src/user/dto/google-register-user.dto';
 import { NewUserCreds } from './dtos/new-user-creds.dto';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { UserDocument } from 'src/user/user.document';
+import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +29,17 @@ export class AuthService {
     const { email, password } = loginDto;
 
     try {
-      this.firebaseService.loginUser(email, password);
+      const user = await this.firebaseService.loginUser(email, password);
+      // log(user);
+
+      const token = await this.signUserToken({
+        id: user.uid,
+        email: user.email,
+      });
+
+      log(token);
+
+      return user;
     } catch (error) {
       throw new Error('Error logging in user: ' + error.message);
     }
@@ -82,5 +95,9 @@ export class AuthService {
     } catch (error) {
       throw new Error(`Error while logging out `);
     }
+  }
+
+  async getProfile(@CurrentUser() user: UserDocument) {
+    return user;
   }
 }

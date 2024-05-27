@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { Injectable, Logger } from '@nestjs/common';
-import { serviceAccountPath, firebaseConfig } from 'src/config/firebase.config'; // Импортируем конфиги
+import { serviceAccountPath, firebaseConfig } from 'src/config/firebase.config';
 import { log } from 'console';
 import { Auth, getAuth } from 'firebase-admin/auth';
 
@@ -30,11 +30,6 @@ export class FirebaseService {
     } else {
       this.firebaseApp = firebase.apps[0];
     }
-
-    log(this.serviceApp.name);
-    log(this.serviceApp.options);
-    log('--------------------------');
-    log(this.firebaseApp.name);
     log(this.firebaseApp.options);
 
     this.firebaseAuth = getAuth(this.serviceApp);
@@ -48,16 +43,14 @@ export class FirebaseService {
     return firebase.auth();
   }
 
-  async loginUser(email: string, password: string): Promise<string> {
+  async loginUser(email: string, password: string) {
     const clientAuth = this.getClientAuth();
-    const userCreds = await clientAuth.signInWithEmailAndPassword(
+    const { user } = await clientAuth.signInWithEmailAndPassword(
       email,
       password,
     );
 
-    const id = userCreds.user.uid;
-    const token = userCreds.user.getIdToken();
-    return id;
+    return user;
   }
 
   async createUser(

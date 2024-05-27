@@ -5,21 +5,17 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { UserRepository } from 'src/user/user.repository';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { UserService } from 'src/user/user.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { jwtConfig } from 'src/config/jwt.config';
 
 @Module({
   imports: [
     PassportModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '1h' },
-      }),
+      useFactory: jwtConfig,
     }),
   ],
   controllers: [AuthController],
@@ -30,7 +26,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     UserRepository,
     FirebaseService,
     UserService,
-    JwtService,
     ConfigService,
   ],
 })

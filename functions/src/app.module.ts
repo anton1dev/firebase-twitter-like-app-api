@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Injectable, Logger } from '@nestjs/common';
-
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PostModule } from './post/post.module';
 import { FirestoreModule } from './firestore/firestore.module';
@@ -13,7 +11,7 @@ import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ cache: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     FirestoreModule.forRoot({
       imports: [ConfigModule],
       useFactory: () => ({
