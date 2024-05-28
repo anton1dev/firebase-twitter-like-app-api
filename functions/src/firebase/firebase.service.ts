@@ -8,8 +8,6 @@ import { log } from 'console';
 import { FirebaseAdmin } from 'nestjs-firebase';
 
 import { Auth, getAuth } from 'firebase-admin/auth';
-import { ChangePasswordDto } from 'src/auth/dtos/change-password.dto';
-import { UserDocument } from 'src/user/user.document';
 
 @Injectable()
 export class FirebaseService {
