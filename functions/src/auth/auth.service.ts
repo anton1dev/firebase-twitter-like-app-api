@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { UserService } from 'src/user/user.service';
 import { LoginDto } from './dtos/login-dto';
@@ -9,6 +9,8 @@ import { GoogleRegisterUser } from 'src/user/dto/google-register-user.dto';
 import { NewUserCreds } from './dtos/new-user-creds.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { UserDocument } from 'src/user/user.document';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -93,6 +95,29 @@ export class AuthService {
       await this.firebaseService.logOutUser();
     } catch (error) {
       throw new Error(`Error while logging out `);
+    }
+  }
+
+  async resetPasswordViaEmail(passwordForgottenDto: ResetPasswordDto) {
+    try {
+      const { email } = passwordForgottenDto;
+      await this.firebaseService.resetPassword(email);
+    } catch (error) {
+      throw new Error(`Error during password reset!`);
+    }
+  }
+
+  async updatePassword(
+    @CurrentUser() user: UserDocument,
+    changePasswordDto: ChangePasswordDto,
+  ) {
+    try {
+      const { newPassword } = changePasswordDto;
+      const userId = user.id;
+
+      await this.firebaseService.updatePassword(userId, newPassword);
+    } catch (error) {
+      throw new Error(`Error during password update!`);
     }
   }
 

@@ -4,6 +4,9 @@ import { LoginDto } from './dtos/login-dto';
 import { RegisterDto } from './dtos/register-dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthJwtGuard } from './guards/auth-jwt.guard';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { UserDocument } from 'src/user/user.document';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,15 +33,29 @@ export class AuthController {
     return this.authService.logout();
   }
 
+  @Post('/password-reset')
+  async resetPasswordViaEmail(@Body() passwordForgottenDto: ResetPasswordDto) {
+    return this.authService.resetPasswordViaEmail(passwordForgottenDto);
+  }
+
+  @Post('/password-change')
+  @UseGuards(AuthJwtGuard)
+  async updatePassword(
+    @CurrentUser() user: UserDocument,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.authService.updatePassword(user, changePasswordDto);
+  }
+
   @UseGuards(AuthJwtGuard)
   @Get('/profile')
-  async getProfile(@CurrentUser() user) {
+  async getProfile(@CurrentUser() user: UserDocument) {
     return user;
   }
 
   @UseGuards(AuthJwtGuard)
   @Delete('/profile/delete')
-  async deleteProfile(@CurrentUser() user) {
+  async deleteProfile(@CurrentUser() user: UserDocument) {
     return this.authService.deleteProfile(user.id);
   }
 }

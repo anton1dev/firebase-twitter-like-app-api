@@ -5,13 +5,18 @@ import 'firebase/compat/firestore';
 import { Injectable, Logger } from '@nestjs/common';
 import { serviceAccountPath, firebaseConfig } from 'src/config/firebase.config';
 import { log } from 'console';
+import { FirebaseAdmin } from 'nestjs-firebase';
+
 import { Auth, getAuth } from 'firebase-admin/auth';
+import { ChangePasswordDto } from 'src/auth/dtos/change-password.dto';
+import { UserDocument } from 'src/user/user.document';
 
 @Injectable()
 export class FirebaseService {
   private readonly logger = new Logger(FirebaseService.name);
   private readonly serviceApp: admin.app.App;
   private readonly firebaseApp: firebase.app.App;
+  private readonly firebaseAdmin: FirebaseAdmin;
   private readonly firebaseAuth: Auth;
 
   constructor() {
@@ -35,11 +40,11 @@ export class FirebaseService {
     this.firebaseAuth = getAuth(this.serviceApp);
   }
 
-  getAdminAuth() {
+  private getAdminAuth() {
     return this.serviceApp.auth();
   }
 
-  getClientAuth() {
+  private getClientAuth() {
     return firebase.auth();
   }
 
@@ -70,6 +75,21 @@ export class FirebaseService {
     const provider = new firebase.auth.GoogleAuthProvider();
 
     return firebase.auth().signInWithPopup(provider);
+  }
+
+  async resetPassword(emailAddress: string): Promise<void> {
+    return firebase.auth().sendPasswordResetEmail(emailAddress);
+  }
+
+  async updatePassword(userId: string, newPassword: string): Promise<string> {
+    const currentUser = admin.auth().getUser(userId);
+
+    await admin.auth().updateUser(userId, {
+      password: newPassword,
+      ...currentUser,
+    });
+
+    return `User's password for ${userId} updated`;
   }
 
   async logOutUser(): Promise<void> {
