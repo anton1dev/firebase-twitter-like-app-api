@@ -4,6 +4,7 @@ import { App } from './App';
 // import { PeoplePage } from './components/PeoplePage/PeoplePage';
 import { NotFoundPage } from './components/NotFoundPage/NotFoundPage';
 import Feed from './components/Feed/Feed';
+import { LoginPage } from './components/LoginPage/LoginPage';
 
 export const Root = () => {
   return (
@@ -12,6 +13,7 @@ export const Root = () => {
         <Route index element={<HomePage />} />
         <Route path="home" element={<Navigate to="/" />} />
         <Route path="feed" element={<Feed />} />
+        <Route path="login" element={<LoginPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

@@ -16,7 +16,7 @@ export const Navbar = () => {
           </NavLink>
 
           <NavLink className={getLinkClass} to="/profile">
-            My Profile
+            Profile
           </NavLink>
 
           <NavLink className={getLinkClass} to="/login">
