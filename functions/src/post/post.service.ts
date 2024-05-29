@@ -11,6 +11,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PostRepository } from './post.repository';
 import { UserRepository } from 'src/user/user.repository';
 import { UserDocument } from 'src/user/user.document';
+import { firestore } from 'firebase-admin';
+
+import 'firebase/firestore';
 
 @Injectable()
 export class PostService {
@@ -65,7 +68,8 @@ export class PostService {
       title,
       text,
       authorId: user.id,
-      createdAt: currentDate,
+      authorNickname: user.nickname,
+      createdAt: firestore.Timestamp.fromDate(currentDate),
       likesScore: 0,
       commentsScore: 0,
       likes: [],

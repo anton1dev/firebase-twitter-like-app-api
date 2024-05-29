@@ -25,7 +25,11 @@ export class PostRepository {
       .offset(startsAt)
       .limit(limitNumber)
       .get();
-    return snapshot.docs.map((post) => ({ id: post.id, ...post.data() }));
+    return snapshot.docs.map((post) => ({
+      id: post.id,
+      createdAt: new Date(post.data().createdAt.toDate().toDateString()),
+      ...post.data(),
+    }));
   }
 
   async getAllByUserId(userId: string): Promise<PostDocument[]> {

@@ -1,3 +1,5 @@
+import { Timestamp } from '@google-cloud/firestore';
+
 export class PostDocument {
   static collectionName = 'posts';
 
@@ -5,7 +7,8 @@ export class PostDocument {
   title: string;
   text: string;
   authorId: string;
-  createdAt: Date;
+  authorNickname: string;
+  createdAt: Timestamp;
   commentsScore: number = 0;
   likes?: string[] = [];
   likesScore: number = 0;
