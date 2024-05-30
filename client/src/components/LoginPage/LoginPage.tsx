@@ -1,38 +1,35 @@
-import { useState } from 'react';
-import { login, logout } from '../../lib/auth';
-import { UserType } from '../../types/UserType';
+import { FormEvent, FormEventHandler, useState } from 'react';
+import { login } from '../../lib/auth';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../app/hooks';
+
+import { actions as userActions } from '../../features/user/userSlice';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
-  const [user, setUser] = useState<UserType | null>(null);
 
-  const handleLogin = (user: UserType) => {
-    setUser(user);
-    navigate('/');
-  };
+  const dispatch = useAppDispatch();
 
-  const handleLogout = async (event: any) => {
-    event.preventDefault();
-    setUser(null);
-    await logout();
-    console.log(`Logged out!`);
-    navigate('/');
-  };
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      const user = await login(email, password);
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-    setError(false);
-    const user: UserType = await login(email, password);
-    if (user) {
-      handleLogin(user);
-      console.log(user.nickname);
-    } else {
+      if (user) {
+        dispatch(userActions.set(user));
+        navigate('/');
+      }
+    } catch (error) {
       setError(true);
     }
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(false);
+    handleLogin(email, password);
   };
 
   return (
@@ -71,9 +68,6 @@ export const LoginPage = () => {
           <div className="control">
             <button type="submit" className="button is-link">
               Login
-            </button>
-            <button type="button" className="button is-danger ml-4" onClick={handleLogout}>
-              Logout
             </button>
           </div>
         </div>

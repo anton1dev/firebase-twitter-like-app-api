@@ -36,7 +36,7 @@ export default function Feed() {
               {isLoadingData && <Loader />}
               {hasError && <p>Error loading posts.</p>}
 
-              {!isLoadingData && !hasError && posts.map((post) => <Post post={post} />)}
+              {!isLoadingData && !hasError && posts.map((post) => <Post key={post.id} post={post} />)}
             </div>
           </div>
         </div>

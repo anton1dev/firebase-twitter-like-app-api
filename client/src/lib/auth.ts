@@ -34,9 +34,9 @@ export async function login(email: string, password: string) {
   }
   const { userId, token } = await response.json();
   localStorage.setItem(ACCESS_TOKEN_KEY, token);
-  console.log();
 
-  return await getUserFromToken(userId);
+  const user = await getUserFromToken(userId);
+  return user;
 }
 
 export function getUser() {
@@ -48,12 +48,13 @@ export function getUser() {
 }
 
 export async function logout() {
-  const response = await axios.post(`${API_URL}/logout`).then(console.log);
+  const response = await axios.post(`${API_URL}/logout`);
   if (!response.ok) {
     return null;
   }
 
   localStorage.removeItem(ACCESS_TOKEN_KEY);
+  return response;
 }
 
 async function getUserFromToken(userId: string) {

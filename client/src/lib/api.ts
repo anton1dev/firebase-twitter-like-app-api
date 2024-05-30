@@ -1,5 +1,5 @@
-import { PostType } from './types/PostType';
-import { UserType } from './types/UserType';
+import { PostType } from './../types/PostType';
+import { UserType } from './../types/UserType';
 
 export const API_URL = 'http://localhost:3000/';
 
