@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { giveDislike, giveLike } from '../../lib/api';
 import { PostType } from '../../types/PostType';
+import { useAppSelector } from '../../app/hooks';
 
 export const Post = ({ post }: { post: PostType }) => {
-  const { text, authorNickname, commentsScore, likesScore, id } = post;
+  const { user } = useAppSelector((state) => state.user);
+
+  const { text, authorNickname, commentsScore, likesScore, likes, dislikes, id } = post;
   const [likesCount, setLikesCount] = useState<number>(likesScore);
   const [commentsCount] = useState<number>(commentsScore);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [isDisliked, setIsDisliked] = useState<boolean>(false);
+  const [isLiked, setIsLiked] = useState<boolean>(user ? !!likes?.includes(user.id) : false);
+  const [isDisliked, setIsDisliked] = useState<boolean>(user ? !!dislikes?.includes(user.id) : false);
 
   const handleLike = async () => {
     try {
@@ -68,18 +71,26 @@ export const Post = ({ post }: { post: PostType }) => {
           </div>
           <nav className="level ml-2">
             <div className="level-left is-flex is-align-items-center">
-              <a className="level-item">
+              <div className="level-item">
                 <span className="icon is-small is-flex is-flex-direction-row ">
-                  <i className="fas fa-regular fa-heart mr-1" onClick={handleLike}></i>
+                  <i
+                    className="fas fa-regular fa-heart mr-1"
+                    onClick={user ? handleLike : undefined}
+                    style={user ? {} : { pointerEvents: 'none' }}
+                  ></i>
                   <span className="">{likesCount}</span>
                 </span>
-              </a>
+              </div>
 
-              <a className="level-item">
+              <div className="level-item">
                 <span className="icon is-small is-flex is-flex-direction-row mr-4">
-                  <i className="fas fa-regular fa-heart-crack mr-1" onClick={handleDislike}></i>
+                  <i
+                    className={`fas ${isDisliked ? 'fa-solid' : 'fa-regular'} fa-heart-crack mr-1`}
+                    onClick={user ? handleDislike : undefined}
+                    style={user ? {} : { pointerEvents: 'none' }}
+                  ></i>
                 </span>
-              </a>
+              </div>
 
               <a className="level-item">
                 <span className="icon is-small is-flex is-flex-direction-row mr-4">
