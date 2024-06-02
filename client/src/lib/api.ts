@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { PostType } from './../types/PostType';
 import { UserType } from './../types/UserType';
 
@@ -19,4 +20,14 @@ export async function getUsers(): Promise<UserType[]> {
   return wait(500)
     .then(() => fetch(`${API_URL}users`))
     .then((response) => response.json());
+}
+
+export async function giveLike(postId: string): Promise<void> {
+  await axios.patch(`${API_URL}posts/like/${postId}`);
+  console.log(1);
+}
+
+export async function giveDislike(postId: string): Promise<void> {
+  await axios.patch(`${API_URL}posts/dislike/${postId}`);
+  console.log(-1);
 }
