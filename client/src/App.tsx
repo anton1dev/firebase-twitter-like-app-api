@@ -1,11 +1,8 @@
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
-import { Navbar } from './components/Navbar';
+import { Navbar } from './components/Navbar/Navbar';
 
 import './App.scss';
-import { useState } from 'react';
-import { UserType } from './types/UserType';
-import { getUser } from './lib/auth';
 
 export const App = () => {
   return (

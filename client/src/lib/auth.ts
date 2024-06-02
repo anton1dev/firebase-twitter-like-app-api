@@ -1,12 +1,14 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/auth';
+import firebase from '../firebase/config';
+import { UserType } from '../types/UserType';
 
+const API_URL = 'http://localhost:3000/auth';
 const ACCESS_TOKEN_KEY = 'accessToken';
 
 axios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -22,21 +24,73 @@ export function getAccessToken() {
 }
 
 export async function login(email: string, password: string) {
-  const response = await fetch(`${API_URL}/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!response.ok) {
+  try {
+    const response = await axios.post(
+      `${API_URL}/login`,
+      { email, password },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    const { token } = response.data;
+    localStorage.setItem(ACCESS_TOKEN_KEY, token);
+
+    const user = await getUserFromToken();
+    return user;
+  } catch (error) {
     return null;
   }
-  const { userId, token } = await response.json();
-  localStorage.setItem(ACCESS_TOKEN_KEY, token);
+}
 
-  const user = await getUserFromToken(userId);
-  return user;
+export async function loginWithGoogle(): Promise<UserType | null> {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await firebase.auth().signInWithPopup(provider);
+    const { user } = result;
+
+    if (!user || !user.displayName || !user.uid || !user.email) {
+      return null;
+    }
+
+    const userData = {
+      id: user.uid,
+      nickname: user.displayName,
+      name: user.displayName?.split(' ')[0],
+      surname: user.displayName?.split(' ')[1],
+      email: user.email,
+      posts: [],
+    };
+
+    try {
+      const response = await axios.post(`${API_URL}/googlesignup`, userData);
+
+      if (response.status !== 200) {
+        throw new Error('Google signup failed');
+      }
+
+      console.log('Google signup successful:', response.data);
+    } catch (error) {
+      console.error('Error during Google signup request:', error);
+    }
+
+    return userData;
+  } catch (error) {
+    console.error('Error during Google login:', error);
+    return null;
+  }
+}
+
+export async function logout() {
+  try {
+    const response = await axios.post(`${API_URL}/logout`);
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+
+    return response;
+  } catch (error) {
+    return null;
+  }
 }
 
 export function getUser() {
@@ -44,24 +98,18 @@ export function getUser() {
   if (!token) {
     return null;
   }
-  return getUserFromToken(token);
+
+  return getUserFromToken();
 }
 
-export async function logout() {
-  const response = await axios.post(`${API_URL}/logout`);
-  if (!response.ok) {
+async function getUserFromToken() {
+  try {
+    const response = await axios.get(`${API_URL}/profile`);
+    const user = response.data;
+
+    return user;
+  } catch (error) {
+    console.error(error);
     return null;
   }
-
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  return response;
-}
-
-async function getUserFromToken(userId: string) {
-  const response = await axios.get(`${API_URL}/profile`).then();
-  const user = response.data;
-
-  console.log(`User ${user.nickname} is here!`);
-
-  return user;
 }

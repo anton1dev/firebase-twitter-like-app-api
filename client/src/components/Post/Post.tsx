@@ -1,8 +1,7 @@
-import { API_URL } from '../../api';
 import { PostType } from '../../types/PostType';
 
 export const Post = ({ post }: { post: PostType }) => {
-  const { authorId, text, authorNickname, commentsScore, likesScore } = post;
+  const { text, authorNickname, commentsScore, likesScore } = post;
 
   return (
     <div className="box">

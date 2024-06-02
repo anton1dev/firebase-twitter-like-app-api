@@ -1,8 +1,10 @@
 import classNames from 'classnames';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { logout } from '../lib/auth';
-import { actions as userActions } from '../features/user/userSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { logout } from '../../lib/auth';
+import { actions as userActions } from '../../features/user/userSlice';
+
+import tweetieLogo from '../../assets/tweetie-logo.png';
 
 export const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -15,7 +17,7 @@ export const Navbar = () => {
       'has-background-grey-lighter': isActive,
     });
 
-  const handleLogout = async (event: React.MouseEvent<HTMLInputElement>) => {
+  const handleLogout = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const result = await logout();
     console.log(1);
@@ -27,34 +29,35 @@ export const Navbar = () => {
 
   return (
     <nav data-cy="nav" className="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
-      <div className="container">
-        <div className="navbar-brand">
+      <div className="container is-flex is-justify-content-space-between">
+        <div className="navbar-brand"></div>
+        <div className="navbar-start is-flex is-flex-direction-row">
           <NavLink className={getLinkClass} to="/">
             Home
           </NavLink>
-
           {user && (
             <NavLink className={getLinkClass} to="/profile">
               Profile
             </NavLink>
           )}
-
           {!user && (
             <NavLink className={getLinkClass} to="/login">
               Login
             </NavLink>
           )}
-
           <NavLink className={getLinkClass} to="/feed">
             Feed
           </NavLink>
+        </div>
 
-          {user && (
-            <button className="navbar-item" onClick={handleLogout}>
+        {user && (
+          <div className="navbar-end">
+            <p className="is-flex is-align-items-center">Welcome, {user.nickname}</p>
+            <button className="has-background-grey-lighter ml-4 p-2" onClick={handleLogout}>
               Logout
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </nav>
   );

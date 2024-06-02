@@ -1,5 +1,5 @@
-import { FormEvent, FormEventHandler, useState } from 'react';
-import { login } from '../../lib/auth';
+import { FormEvent, useState } from 'react';
+import { login, loginWithGoogle } from '../../lib/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../app/hooks';
 
@@ -17,12 +17,18 @@ export const LoginPage = () => {
     try {
       const user = await login(email, password);
 
-      if (user) {
-        dispatch(userActions.set(user));
-        navigate('/');
+      if (!user) {
+        setError(true);
+        setPassword('');
+
+        return;
       }
+
+      dispatch(userActions.set(user));
+      navigate('/');
     } catch (error) {
       setError(true);
+      navigate('/error');
     }
   };
 
@@ -30,6 +36,20 @@ export const LoginPage = () => {
     event.preventDefault();
     setError(false);
     handleLogin(email, password);
+  };
+
+  const handleGoogleAuth = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
+    const user = await loginWithGoogle();
+
+    if (!user) {
+      setError(true);
+      return;
+    }
+
+    dispatch(userActions.set(user));
+    navigate('/');
   };
 
   return (
@@ -65,9 +85,13 @@ export const LoginPage = () => {
           </div>
         )}
         <div className="field">
-          <div className="control">
+          <div className="control is-flex is-flex-direction-row is-justify-content-flex-start">
             <button type="submit" className="button is-link">
               Login
+            </button>
+
+            <button type="button" className="button is-primary ml-5" onClick={handleGoogleAuth}>
+              Login via Google
             </button>
           </div>
         </div>
