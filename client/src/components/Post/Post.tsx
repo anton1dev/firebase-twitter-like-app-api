@@ -5,7 +5,7 @@ import { PostType } from '../../types/PostType';
 export const Post = ({ post }: { post: PostType }) => {
   const { text, authorNickname, commentsScore, likesScore, id } = post;
   const [likesCount, setLikesCount] = useState<number>(likesScore);
-  const [commentsCount, setCommentsCount] = useState<number>(commentsScore);
+  const [commentsCount] = useState<number>(commentsScore);
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isDisliked, setIsDisliked] = useState<boolean>(false);
 

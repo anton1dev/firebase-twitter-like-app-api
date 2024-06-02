@@ -4,8 +4,6 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { logout } from '../../lib/auth';
 import { actions as userActions } from '../../features/user/userSlice';
 
-import tweetieLogo from '../../assets/tweetie-logo.png';
-
 export const Navbar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
