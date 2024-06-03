@@ -3,10 +3,12 @@ import { User } from '../../interfaces/User';
 
 export interface UserState {
   user: User | null;
+  isLoading: boolean;
 }
 
 const initialState: UserState = {
   user: null,
+  isLoading: false,
 };
 
 export const userSlice = createSlice({
@@ -15,10 +17,16 @@ export const userSlice = createSlice({
   reducers: {
     set: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
+      state.isLoading = false;
     },
 
     clear: (state) => {
       state.user = null;
+      state.isLoading = false;
+    },
+
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
     },
   },
 });

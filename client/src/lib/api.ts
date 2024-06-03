@@ -14,13 +14,13 @@ function getAuthToken(): string | null {
 }
 
 export async function getPosts(): Promise<Post[]> {
-  return wait(500)
+  return wait(0)
     .then(() => fetch(`${API_URL}posts`))
     .then((response) => response.json());
 }
 
 export async function getPostsByUser(userId: string): Promise<Post[]> {
-  return wait(500)
+  return wait(200)
     .then(() => fetch(`${API_URL}posts/user/${userId}`))
     .then((response) => response.json());
 }
@@ -31,8 +31,12 @@ export async function getPostsByQuery(query: string): Promise<Post[]> {
     .then((response) => response.json());
 }
 
+export async function deletePostById(postId: string): Promise<void> {
+  return axios.delete(`${API_URL}posts/${postId}`);
+}
+
 export async function getUsers(): Promise<User[]> {
-  return wait(500)
+  return wait(0)
     .then(() => fetch(`${API_URL}users`))
     .then((response) => response.json());
 }

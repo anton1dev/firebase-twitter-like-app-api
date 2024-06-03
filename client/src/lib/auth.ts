@@ -40,7 +40,10 @@ export async function signup(newUserData: NewUser) {
 
 export async function googleSignup(newUserData: User) {
   try {
-    await axios.post(`${API_URL}/auth/googlesignup`, newUserData);
+    const response = await axios.post(`${API_URL}/auth/googlesignup`, newUserData);
+    console.log('1234');
+    const { token } = response.data;
+    setAccessToken(token);
 
     return newUserData;
   } catch (err) {
@@ -83,6 +86,9 @@ export async function loginWithGoogle(): Promise<User | null> {
 
     const existingUser = await getUserByEmail(user.email);
     if (existingUser) {
+      const token = await user.getIdToken();
+      setAccessToken(token);
+
       return existingUser;
     }
 
@@ -127,11 +133,26 @@ async function getUserByEmail(email: string): Promise<User | null> {
 
 export async function logout() {
   try {
-    const response = await axios.post(`${API_URL}/auth/logout`);
+    const token = getAccessToken();
+    if (!token) {
+      throw new Error('No access token found');
+    }
+
+    const response = await axios.post(
+      `${API_URL}/auth/logout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
     localStorage.removeItem(ACCESS_TOKEN_KEY);
 
     return response;
   } catch (error) {
+    console.error('Error during logout:', error);
     return null;
   }
 }
@@ -143,6 +164,21 @@ export function getUser() {
   }
 
   return getUserInfo();
+}
+
+export async function deleteUser() {
+  const token = getAccessToken();
+  if (!token) {
+    return null;
+  }
+
+  await logout();
+
+  await axios.delete(`${API_URL}/auth/profile/delete`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 }
 
 async function getUserInfo() {

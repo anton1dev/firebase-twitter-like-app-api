@@ -3,10 +3,15 @@ import { giveDislike, giveLike } from '../../lib/api';
 import { Post as PostInterface } from '../../interfaces/Post';
 import { useAppSelector } from '../../app/hooks';
 
-export const Post = ({ post }: { post: PostInterface }) => {
+interface PostProps {
+  post: PostInterface;
+  onDelete: (postId: string) => Promise<void>;
+}
+
+export const Post = ({ post, onDelete }: PostProps) => {
   const { user } = useAppSelector((state) => state.user);
 
-  const { text, title, authorNickname, commentsScore, likesScore, likes, dislikes, id } = post;
+  const { text, title, authorNickname, commentsScore, likesScore, likes, dislikes, id, authorId } = post;
   const [likesCount, setLikesCount] = useState<number>(likesScore);
   const [commentsCount] = useState<number>(commentsScore);
   const [isLiked, setIsLiked] = useState<boolean>(user ? !!likes?.includes(user.id) : false);
@@ -48,6 +53,20 @@ export const Post = ({ post }: { post: PostInterface }) => {
       }
     } catch (error) {
       console.error('Error while sending dislike:', error);
+    }
+  };
+
+  const handleEdit = () => {
+    // Логика для редактирования поста
+    console.log('Edit post', id);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await onDelete(id);
+      console.log('Delete post', id);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -101,6 +120,23 @@ export const Post = ({ post }: { post: PostInterface }) => {
               </a>
             </div>
           </nav>
+        </div>
+
+        <div className="media-right">
+          {user?.id === authorId && (
+            <div className="buttons">
+              <button className="button is-small" onClick={handleEdit}>
+                <span className="icon">
+                  <i className="fas fa-edit"></i>
+                </span>
+              </button>
+              <button className="button is-small is-danger" onClick={handleDelete}>
+                <span className="icon">
+                  <i className="fas fa-trash"></i>
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </article>
     </div>

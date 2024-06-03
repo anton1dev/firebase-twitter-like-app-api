@@ -21,7 +21,7 @@ export class PostRepository {
     const startsAt = (pageNumber - 1) * limitNumber;
 
     const snapshot = await this.postCollection
-      .orderBy('createdAt')
+      .orderBy('createdAt', 'desc')
       .offset(startsAt)
       .limit(limitNumber)
       .get();

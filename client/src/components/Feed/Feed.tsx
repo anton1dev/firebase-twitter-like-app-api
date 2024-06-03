@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Post as PostInterface } from '../../interfaces/Post';
-import { getPosts, createPost } from '../../lib/api';
+import { getPosts, createPost, deletePostById } from '../../lib/api';
 import { Post } from '../Post/Post';
 import { Loader } from '../Loader';
 import { CreatePostModal } from '../CreatePostModal/CreatePostModal';
 import { Searchbar } from '../Searchbar/Searchbar';
+import { useAppSelector } from '../../app/hooks';
 
 export default function Feed() {
   const [hasError, setHasError] = useState<boolean>(false);
@@ -12,10 +13,13 @@ export default function Feed() {
   const [posts, setPosts] = useState<PostInterface[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    setIsLoadingData(true);
-    getPosts()
+  const { user } = useAppSelector((state) => state.user);
+
+  const getPostsFromApi = async () => {
+    await getPosts()
       .then((data) => {
+        setIsLoadingData(true);
+
         setPosts(data);
         setIsLoadingData(false);
       })
@@ -24,12 +28,19 @@ export default function Feed() {
         setHasError(true);
         setIsLoadingData(false);
       });
+  };
+
+  useEffect(() => {
+    getPostsFromApi();
   }, []);
 
   const handleCreatePost = async (title: string, text: string, image: File | null) => {
     try {
+      setIsLoadingData(true);
       const newPost = await createPost({ title, text, image });
-      setPosts([newPost, ...posts]);
+      setPosts([...posts, newPost]);
+      await getPostsFromApi();
+      setIsLoadingData(false);
     } catch (error) {
       console.error('Error creating post:', error);
       setHasError(true);
@@ -44,14 +55,24 @@ export default function Feed() {
     }, 100);
   };
 
+  const handleDeletePost = async (postId: string) => {
+    try {
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+      await deletePostById(postId);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
   return (
     <>
       <h1 className="title">Feed Page</h1>
 
       <div className="is-flex is-justify-content-space-between">
-        <button className="button is-primary mb-4" onClick={() => setIsModalOpen(true)}>
-          Create Post
-        </button>
+        {user && (
+          <button className="button is-primary mb-4" onClick={() => setIsModalOpen(true)}>
+            Create Post
+          </button>
+        )}
         <Searchbar onSearch={handleSearchPosts} />
       </div>
 
@@ -68,7 +89,7 @@ export default function Feed() {
               ) : !posts.length ? (
                 <p>No posts here</p>
               ) : (
-                posts.map((post) => <Post key={post.id} post={post} />)
+                posts.map((post) => <Post key={post.id} post={post} onDelete={handleDeletePost} />)
               )}
             </div>
           </div>
