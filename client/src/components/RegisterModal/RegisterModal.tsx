@@ -32,7 +32,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose })
 
       dispatch(userActions.set(user));
       navigate('/');
-      onClose(); // Close the modal on successful signup
+      onClose();
     } catch (error) {
       setError(true);
       navigate('/error');

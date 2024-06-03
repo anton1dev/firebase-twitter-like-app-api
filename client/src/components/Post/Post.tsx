@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { giveDislike, giveLike } from '../../lib/api';
-import { PostType } from '../../types/PostType';
+import { Post as PostInterface } from '../../interfaces/Post';
 import { useAppSelector } from '../../app/hooks';
 
-export const Post = ({ post }: { post: PostType }) => {
+export const Post = ({ post }: { post: PostInterface }) => {
   const { user } = useAppSelector((state) => state.user);
 
-  const { text, authorNickname, commentsScore, likesScore, likes, dislikes, id } = post;
+  const { text, title, authorNickname, commentsScore, likesScore, likes, dislikes, id } = post;
   const [likesCount, setLikesCount] = useState<number>(likesScore);
   const [commentsCount] = useState<number>(commentsScore);
   const [isLiked, setIsLiked] = useState<boolean>(user ? !!likes?.includes(user.id) : false);
@@ -62,7 +62,10 @@ export const Post = ({ post }: { post: PostType }) => {
         <div className="media-content is-flex is-flex-direction-column">
           <div className="content">
             <p>
-              <strong>{authorNickname}</strong> <small>{`@${authorNickname}`}</small>
+              <a className="has-text-weight-semibold has-text-important">{authorNickname}</a>{' '}
+              <small>{`@${authorNickname}`}</small>
+              <br />
+              <span className="has-text-weight-bold">{title}</span>
               <br />
               {text}
             </p>

@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 import firebase from '../firebase/config';
-import { UserType } from '../types/UserType';
-import { NewUserType } from '../types/NewUserType';
+import { User } from '../interfaces/User';
+import { NewUser } from '../interfaces/NewUser';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://us-central1-fir-twitter-like-app.cloudfunctions.net/api';
 const ACCESS_TOKEN_KEY = 'accessToken';
 
 axios.interceptors.request.use(
@@ -28,9 +28,9 @@ function setAccessToken(token: string) {
   return localStorage.setItem(ACCESS_TOKEN_KEY, token);
 }
 
-export async function signup(newUserData: NewUserType) {
+export async function signup(newUserData: NewUser) {
   try {
-    const user: UserType = await axios.post(`${API_URL}/auth/signup`, newUserData);
+    const user: User = await axios.post(`${API_URL}/auth/signup`, newUserData);
 
     return user;
   } catch (err) {
@@ -38,7 +38,7 @@ export async function signup(newUserData: NewUserType) {
   }
 }
 
-export async function googleSignup(newUserData: UserType) {
+export async function googleSignup(newUserData: User) {
   try {
     await axios.post(`${API_URL}/auth/googlesignup`, newUserData);
 
@@ -70,7 +70,7 @@ export async function login(email: string, password: string) {
   }
 }
 
-export async function loginWithGoogle(): Promise<UserType | null> {
+export async function loginWithGoogle(): Promise<User | null> {
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
     const result = await firebase.auth().signInWithPopup(provider);
@@ -86,7 +86,7 @@ export async function loginWithGoogle(): Promise<UserType | null> {
       return existingUser;
     }
 
-    const userData: UserType = {
+    const userData: User = {
       id: user.uid,
       nickname: user.displayName,
       name: user.displayName?.split(' ')[0],
@@ -109,7 +109,7 @@ export async function loginWithGoogle(): Promise<UserType | null> {
   }
 }
 
-async function getUserByEmail(email: string): Promise<UserType | null> {
+async function getUserByEmail(email: string): Promise<User | null> {
   try {
     const response = await axios.get(`${API_URL}/users/email?email=${email}`);
     const users = response.data;

@@ -3,7 +3,7 @@ import { login, loginWithGoogle } from '../../lib/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../app/hooks';
 import { actions as userActions } from '../../features/user/userSlice';
-import { RegisterModal } from '../RegisterPage/RegisterModal'; // Make sure the path is correct
+import { RegisterModal } from '../RegisterModal/RegisterModal';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -17,7 +17,6 @@ export const LoginPage = () => {
   const handleLogin = async (email: string, password: string) => {
     try {
       const user = await login(email, password);
-      console.log(user);
 
       if (!user) {
         setError(true);

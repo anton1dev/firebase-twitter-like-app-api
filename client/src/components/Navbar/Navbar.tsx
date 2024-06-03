@@ -17,9 +17,7 @@ export const Navbar = () => {
 
   const handleLogout = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const result = await logout();
-    console.log(1);
-    console.log(result);
+    await logout();
 
     dispatch(userActions.clear());
     navigate('/');
