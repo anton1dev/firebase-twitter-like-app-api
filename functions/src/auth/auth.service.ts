@@ -29,7 +29,6 @@ export class AuthService {
   }
 
   async loginUser(loginDto: LoginDto) {
-    log(loginDto);
     const { email, password } = loginDto;
 
     try {
@@ -50,8 +49,6 @@ export class AuthService {
   }
 
   async createUser(userDto: RegisterDto): Promise<NewUserCreds> {
-    log(`This is user DTO`);
-    log(userDto);
     const { email, password, nickname, name, surname } = userDto;
 
     try {
@@ -66,8 +63,6 @@ export class AuthService {
         name,
         surname,
       };
-
-      console.log(user);
 
       await this.userService.createUser(user);
       await userCreds.sendEmailVerification();
@@ -118,7 +113,7 @@ export class AuthService {
         }),
       };
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 

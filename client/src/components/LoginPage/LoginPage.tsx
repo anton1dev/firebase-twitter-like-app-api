@@ -2,20 +2,22 @@ import { FormEvent, useState } from 'react';
 import { login, loginWithGoogle } from '../../lib/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../app/hooks';
-
 import { actions as userActions } from '../../features/user/userSlice';
+import { RegisterModal } from '../RegisterPage/RegisterModal'; // Make sure the path is correct
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const dispatch = useAppDispatch();
 
   const handleLogin = async (email: string, password: string) => {
     try {
       const user = await login(email, password);
+      console.log(user);
 
       if (!user) {
         setError(true);
@@ -41,7 +43,6 @@ export const LoginPage = () => {
   const handleGoogleAuth = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    console.log('starting...');
     const user = await loginWithGoogle();
 
     if (!user) {
@@ -97,6 +98,12 @@ export const LoginPage = () => {
           </div>
         </div>
       </form>
+
+      <button type="button" onClick={() => setIsModalOpen(true)} className="button is-danger mt-5">
+        Click here to register
+      </button>
+
+      <RegisterModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };

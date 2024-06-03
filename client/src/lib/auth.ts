@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import firebase from '../firebase/config';
 import { UserType } from '../types/UserType';
+import { NewUserType } from '../types/NewUserType';
 
 const API_URL = 'http://localhost:3000';
 const ACCESS_TOKEN_KEY = 'accessToken';
@@ -19,44 +20,40 @@ axios.interceptors.request.use(
   },
 );
 
-export function getAccessToken() {
+function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_KEY) ?? undefined;
 }
 
-export function setAccessToken(token: string) {
+function setAccessToken(token: string) {
   return localStorage.setItem(ACCESS_TOKEN_KEY, token);
 }
 
-export async function signup(newUserData: UserType) {
+export async function signup(newUserData: NewUserType) {
   try {
-    console.log(newUserData);
-
     const user: UserType = await axios.post(`${API_URL}/auth/signup`, newUserData);
-    console.log(user);
 
     return user;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
 export async function googleSignup(newUserData: UserType) {
   try {
-    console.log(newUserData);
-
     const user: UserType = await axios.post(`${API_URL}/auth/googlesignup`, newUserData);
-    console.log(user);
 
     return newUserData;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
 export async function login(email: string, password: string) {
   try {
+    console.log(email, password);
+
     const response = await axios.post(
-      `${API_URL}/login`,
+      `${API_URL}/auth/login`,
       { email, password },
       {
         headers: {
@@ -64,6 +61,8 @@ export async function login(email: string, password: string) {
         },
       },
     );
+    console.log(response);
+
     const { token } = response.data;
     setAccessToken(token);
     const user = await getUserInfo();
@@ -112,14 +111,8 @@ export async function loginWithGoogle(): Promise<UserType | null> {
     const registeredUser = await googleSignup(userData);
 
     if (registeredUser) {
-      // Если регистрация прошла успешно, возвращаем зарегистрированного пользователя
-      console.log(`registreduser`);
-
       return registeredUser;
     } else {
-      // Если регистрация не удалась, возвращаем информацию о пользователе
-      console.log(`User data`);
-
       console.log(userData);
 
       return userData;
