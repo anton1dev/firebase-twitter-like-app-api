@@ -40,7 +40,7 @@ export async function signup(newUserData: NewUserType) {
 
 export async function googleSignup(newUserData: UserType) {
   try {
-    const user: UserType = await axios.post(`${API_URL}/auth/googlesignup`, newUserData);
+    await axios.post(`${API_URL}/auth/googlesignup`, newUserData);
 
     return newUserData;
   } catch (err) {
@@ -50,8 +50,6 @@ export async function googleSignup(newUserData: UserType) {
 
 export async function login(email: string, password: string) {
   try {
-    console.log(email, password);
-
     const response = await axios.post(
       `${API_URL}/auth/login`,
       { email, password },
@@ -61,7 +59,6 @@ export async function login(email: string, password: string) {
         },
       },
     );
-    console.log(response);
 
     const { token } = response.data;
     setAccessToken(token);
@@ -80,23 +77,14 @@ export async function loginWithGoogle(): Promise<UserType | null> {
 
     const { user } = result;
 
-    console.log('this is user');
-
-    console.log(user);
-
     if (!user || !user.displayName || !user.uid || !user.email) {
       return null;
     }
 
     const existingUser = await getUserByEmail(user.email);
     if (existingUser) {
-      console.log(existingUser);
-
       return existingUser;
     }
-
-    console.log(`User from frontend: `);
-    console.log(user.displayName);
 
     const userData: UserType = {
       id: user.uid,
@@ -113,8 +101,6 @@ export async function loginWithGoogle(): Promise<UserType | null> {
     if (registeredUser) {
       return registeredUser;
     } else {
-      console.log(userData);
-
       return userData;
     }
   } catch (error) {
