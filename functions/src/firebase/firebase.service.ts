@@ -4,7 +4,6 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { Injectable, Logger } from '@nestjs/common';
 import { serviceAccountPath, firebaseConfig } from 'src/config/firebase.config';
-import { log } from 'console';
 import { FirebaseAdmin } from 'nestjs-firebase';
 
 import { Auth, getAuth } from 'firebase-admin/auth';
@@ -22,18 +21,15 @@ export class FirebaseService {
       this.serviceApp = admin.initializeApp({
         credential: admin.credential.cert(serviceAccountPath),
       });
-      this.logger.log('Firebase Admin initialized successfully!');
     } else {
       this.serviceApp = admin.apps[0];
     }
 
     if (!firebase.apps.length) {
       this.firebaseApp = firebase.initializeApp(firebaseConfig);
-      this.logger.log('Firebase Client initialized successfully!');
     } else {
       this.firebaseApp = firebase.apps[0];
     }
-    log(this.firebaseApp.options);
 
     this.firebaseAuth = getAuth(this.serviceApp);
   }

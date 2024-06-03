@@ -7,6 +7,7 @@ import { AuthJwtGuard } from './guards/auth-jwt.guard';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { UserDocument } from 'src/user/user.document';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,8 +24,8 @@ export class AuthController {
   }
 
   @Post('googlesignup')
-  async signupGoogle() {
-    return await this.authService.signUpWithGooglePopup();
+  async signupGoogle(@Body() createGoogleUser: CreateUserDto) {
+    return await this.authService.signUpWithGooglePopup(createGoogleUser);
   }
 
   @UseGuards(AuthJwtGuard)

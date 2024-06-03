@@ -72,22 +72,22 @@ export class AuthService {
     }
   }
 
-  async signUpWithGooglePopup(): Promise<NewUserCreds> {
-    const { user } = await this.firebaseService.signUpWithGooglePopup();
-    const newUser: CreateUserDto = {
-      id: user.uid,
-      email: user.email,
-      name: user.displayName.split(' ')[0],
-      surname: user.displayName.split(' ')[1],
-      nickname: user.displayName,
-    };
+  async signUpWithGooglePopup(
+    createUserDto: CreateUserDto,
+  ): Promise<NewUserCreds> {
+    try {
+      const newUser = await this.userService.createUser(createUserDto);
 
-    await this.userService.createUser(newUser);
-
-    return {
-      id: newUser.id,
-      token: await this.signUserToken({ id: newUser.id, email: newUser.email }),
-    };
+      return {
+        id: newUser.id,
+        token: await this.signUserToken({
+          id: newUser.id,
+          email: newUser.email,
+        }),
+      };
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async logout() {

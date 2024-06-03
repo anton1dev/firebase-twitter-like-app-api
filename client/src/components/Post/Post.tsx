@@ -27,7 +27,6 @@ export const Post = ({ post }: { post: PostType }) => {
         setIsLiked(false);
         await giveDislike(id);
       }
-      console.log('Like sent successfully');
     } catch (error) {
       console.error('Error while sending like:', error);
     }
@@ -47,7 +46,6 @@ export const Post = ({ post }: { post: PostType }) => {
         setIsDisliked(false);
         setLikesCount((prev) => prev + 1);
       }
-      console.log('Dislike sent successfully');
     } catch (error) {
       console.error('Error while sending dislike:', error);
     }

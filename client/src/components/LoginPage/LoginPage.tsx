@@ -49,6 +49,8 @@ export const LoginPage = () => {
     }
 
     dispatch(userActions.set(user));
+    console.log(user);
+
     navigate('/');
   };
 
@@ -91,7 +93,7 @@ export const LoginPage = () => {
             </button>
 
             <button type="button" className="button is-primary ml-5" onClick={handleGoogleAuth}>
-              Login via Google
+              Sign in with Google
             </button>
           </div>
         </div>

@@ -23,6 +23,20 @@ export function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_KEY) ?? undefined;
 }
 
+export function setAccessToken(token: string) {
+  return localStorage.setItem(ACCESS_TOKEN_KEY, token);
+}
+
+export async function signup(newUserData: UserType) {
+  try {
+    const user: UserType = await axios.post(`${API_URL}/googlesignup`, { newUserData });
+
+    return user;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 export async function login(email: string, password: string) {
   try {
     const response = await axios.post(
@@ -35,9 +49,9 @@ export async function login(email: string, password: string) {
       },
     );
     const { token } = response.data;
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
+    setAccessToken(token);
+    const user = await getUserInfo();
 
-    const user = await getUserFromToken();
     return user;
   } catch (error) {
     return null;
@@ -48,6 +62,7 @@ export async function loginWithGoogle(): Promise<UserType | null> {
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
     const result = await firebase.auth().signInWithPopup(provider);
+
     const { user } = result;
 
     if (!user || !user.displayName || !user.uid || !user.email) {
@@ -65,12 +80,14 @@ export async function loginWithGoogle(): Promise<UserType | null> {
 
     try {
       const response = await axios.post(`${API_URL}/googlesignup`, userData);
+      const user = await signup(userData);
 
-      if (response.status !== 200) {
-        throw new Error('Google signup failed');
+      if (user) {
+        const { token } = response.data;
+
+        setAccessToken(token);
+        return user;
       }
-
-      console.log('Google signup successful:', response.data);
     } catch (error) {
       console.error('Error during Google signup request:', error);
     }
@@ -99,10 +116,10 @@ export function getUser() {
     return null;
   }
 
-  return getUserFromToken();
+  return getUserInfo();
 }
 
-async function getUserFromToken() {
+async function getUserInfo() {
   try {
     const response = await axios.get(`${API_URL}/profile`);
     const user = response.data;
