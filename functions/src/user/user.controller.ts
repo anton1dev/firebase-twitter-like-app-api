@@ -6,6 +6,7 @@ import {
   Param,
   Body,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDocument } from './user.document';
@@ -19,6 +20,13 @@ export class UserController {
   @Get()
   async getUsers(): Promise<UserDocument[]> {
     return await this.userService.findAll();
+  }
+
+  @Get('/email')
+  async getUserByEmail(
+    @Query('email') email: string,
+  ): Promise<UserDocument | null> {
+    return this.userService.getUserByEmail(email);
   }
 
   @Get(':id')

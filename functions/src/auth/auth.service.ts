@@ -11,6 +11,8 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { UserDocument } from 'src/user/user.document';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +29,7 @@ export class AuthService {
   }
 
   async loginUser(loginDto: LoginDto) {
+    log(loginDto);
     const { email, password } = loginDto;
 
     try {
@@ -38,7 +41,7 @@ export class AuthService {
       });
 
       return {
-        userId: user.uid,
+        id: user.uid,
         token,
       };
     } catch (error) {
@@ -47,6 +50,8 @@ export class AuthService {
   }
 
   async createUser(userDto: RegisterDto): Promise<NewUserCreds> {
+    log(`This is user DTO`);
+    log(userDto);
     const { email, password, nickname, name, surname } = userDto;
 
     try {
@@ -56,10 +61,14 @@ export class AuthService {
       const user: CreateUserDto = {
         id: userCreds.uid,
         email: userCreds.email,
+        password,
         nickname,
         name,
         surname,
       };
+
+      console.log(user);
+
       await this.userService.createUser(user);
       await userCreds.sendEmailVerification();
 
@@ -72,10 +81,33 @@ export class AuthService {
     }
   }
 
+  async createGoogleUser(userDto: RegisterDto): Promise<UserDocument> {
+    const id = uuidv4();
+
+    const user: CreateUserDto = { id, ...userDto };
+
+    const userCreated = await this.userService.createUser(user);
+
+    return userCreated;
+  }
+
   async signUpWithGooglePopup(
     createUserDto: CreateUserDto,
   ): Promise<NewUserCreds> {
     try {
+      const userCheck = await this.userService.getUserByEmail(
+        createUserDto.email,
+      );
+
+      if (userCheck) {
+        return {
+          id: userCheck.id,
+          token: await this.signUserToken({
+            id: userCheck.id,
+            email: userCheck.email,
+          }),
+        };
+      }
       const newUser = await this.userService.createUser(createUserDto);
 
       return {

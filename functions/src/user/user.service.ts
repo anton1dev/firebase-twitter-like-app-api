@@ -3,7 +3,6 @@ import { UserDocument } from './user.document';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './user.repository';
-import { log } from 'console';
 
 @Injectable()
 export class UserService {
@@ -23,6 +22,16 @@ export class UserService {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<UserDocument | null> {
+    const user = await this.userRepository.getOneByEmail(email);
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
   async createUser(createUserDto: CreateUserDto): Promise<UserDocument> {
     const { id, nickname, email, name, surname } = createUserDto;
     const newUser: UserDocument = {
@@ -37,8 +46,6 @@ export class UserService {
     const userCheck = await this.userRepository.getOneById(id);
 
     if (userCheck) {
-      console.log('this user already exists!');
-
       return newUser;
     }
 

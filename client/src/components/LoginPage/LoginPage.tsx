@@ -41,6 +41,7 @@ export const LoginPage = () => {
   const handleGoogleAuth = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
+    console.log('starting...');
     const user = await loginWithGoogle();
 
     if (!user) {
@@ -49,8 +50,6 @@ export const LoginPage = () => {
     }
 
     dispatch(userActions.set(user));
-    console.log(user);
-
     navigate('/');
   };
 

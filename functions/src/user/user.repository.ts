@@ -19,6 +19,24 @@ export class UserRepository {
     return (await this.userCollection.doc(userId).get()).data();
   }
 
+  async getOneByEmail(email: string): Promise<UserDocument | null> {
+    try {
+      const querySnapshot = await this.userCollection
+        .where('email', '==', email)
+        .limit(1)
+        .get();
+
+      if (!querySnapshot.empty) {
+        return querySnapshot.docs[0].data() as UserDocument;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return null;
+    }
+  }
+
   async create(newUser: UserDocument): Promise<UserDocument> {
     await this.userCollection.doc(newUser.id).set(newUser);
 
