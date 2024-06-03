@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Post as PostInterface } from '../../interfaces/Post';
-import { getPosts, createPost, wait } from '../../lib/api';
+import { getPosts, createPost } from '../../lib/api';
 import { Post } from '../Post/Post';
 import { Loader } from '../Loader';
 import { CreatePostModal } from '../CreatePostModal/CreatePostModal';
