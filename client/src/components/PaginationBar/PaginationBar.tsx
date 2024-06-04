@@ -69,7 +69,7 @@ function getVisiblePages(current: number, total: number) {
 }
 
 function range(count: any, start = 1) {
-  return Array.from(new Array(count), (x, i) => i + start);
+  return Array.from(new Array(count), (_x, i) => i + start);
 }
 
 export default PaginationBar;

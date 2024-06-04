@@ -16,7 +16,7 @@ export default function Feed() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [feedLength, setFeedLength] = useState(1);
+  const [_feedLength, setFeedLength] = useState(1);
 
   const { user } = useAppSelector((state) => state.user);
 
@@ -41,7 +41,7 @@ export default function Feed() {
       setIsLoadingData(true);
       const newPost = await createPost({ title, text, image });
       setPosts([...posts, newPost]);
-      await getPostsFromApi();
+      await getPostsFromApi(currentPage);
       setIsLoadingData(false);
     } catch (error) {
       console.error('Error creating post:', error);
