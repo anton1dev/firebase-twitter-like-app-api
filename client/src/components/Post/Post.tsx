@@ -209,7 +209,7 @@ export const Post = ({ post, onDelete }: PostProps) => {
                   </span>
                 </div>
 
-                <button className="level-item" onClick={handleToggleComments}>
+                <button className="level-item" disabled={!user} onClick={handleToggleComments}>
                   <span className="icon is-small is-flex is-flex-direction-row mr-4">
                     <i className="fa-regular fa-comment"></i>
                     <span className="ml-1">{commentCount}</span>
