@@ -25,7 +25,7 @@ export class PostService {
 
   async getAllPosts(
     page: string = '1',
-    limit: string = '20',
+    limit: string = '10',
   ): Promise<PostDocument[]> {
     return await this.postRepository.getAll(page, limit);
   }

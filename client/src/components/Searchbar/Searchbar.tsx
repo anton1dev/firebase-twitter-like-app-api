@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Post as PostInterface } from '../../interfaces/Post';
-import { getPosts, getPostsByQuery } from '../../lib/api';
+import { getPostsPaginated, getPostsByQuery } from '../../lib/api';
 
 interface SearchbarProps {
   onSearch: (searchedPosts: PostInterface[]) => void;
@@ -30,7 +30,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({ onSearch }) => {
 
     setSearchTerm('');
 
-    const allPosts = await getPosts();
+    const allPosts = await getPostsPaginated();
 
     onSearch(allPosts);
   };

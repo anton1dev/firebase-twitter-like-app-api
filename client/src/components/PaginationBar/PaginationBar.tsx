@@ -1,4 +1,12 @@
-function PaginationBar({ currentPage, totalPages, onPageChange }) {
+function PaginationBar({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: any;
+}) {
   const pages = getVisiblePages(currentPage, totalPages);
   return (
     <nav className="pagination is-centered" role="navigation" aria-label="pagination">
@@ -29,7 +37,7 @@ function PaginationBar({ currentPage, totalPages, onPageChange }) {
   );
 }
 
-function PageButton({ page, currentPage, onClick }) {
+function PageButton({ page, currentPage, onClick }: { page: any; currentPage: number; onClick: () => void }) {
   if (page === currentPage) {
     return (
       <button className="pagination-link is-current" aria-label={`Page ${page}`} aria-current="page">
@@ -47,7 +55,7 @@ function PageButton({ page, currentPage, onClick }) {
   );
 }
 
-function getVisiblePages(current, total) {
+function getVisiblePages(current: number, total: number) {
   if (total <= 7) {
     return range(total);
   }
@@ -60,7 +68,7 @@ function getVisiblePages(current, total) {
   return [1, '<', current - 1, current, current + 1, '>', total];
 }
 
-function range(count, start = 1) {
+function range(count: any, start = 1) {
   return Array.from(new Array(count), (x, i) => i + start);
 }
 

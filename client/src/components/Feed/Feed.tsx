@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Post as PostInterface } from '../../interfaces/Post';
-import { getPosts, createPost, deletePostById } from '../../lib/api';
+import { createPost, deletePostById, getAllPostsLength, getPostsPaginated } from '../../lib/api';
 import { Post } from '../Post/Post';
 import { Loader } from '../Loader';
 import { CreatePostModal } from '../CreatePostModal/CreatePostModal';
 import { Searchbar } from '../Searchbar/Searchbar';
 import { useAppSelector } from '../../app/hooks';
 import { POSTS_PER_PAGE } from '../../config/variables';
+import PaginationBar from '../PaginationBar/PaginationBar';
 
 export default function Feed() {
   const [hasError, setHasError] = useState<boolean>(false);
@@ -14,28 +15,26 @@ export default function Feed() {
   const [posts, setPosts] = useState<PostInterface[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [feedLength, setFeedLength] = useState(1);
 
   const { user } = useAppSelector((state) => state.user);
-  const totalPages = Math.ceil((posts.length + 1) / POSTS_PER_PAGE);
 
-  const getPostsFromApi = async () => {
-    await getPosts()
-      .then((data) => {
-        setIsLoadingData(true);
+  const getPostsFromApi = async (currentPage: number) => {
+    const lengthOfAllPosts = await getAllPostsLength();
+    setFeedLength(lengthOfAllPosts);
 
-        setPosts(data);
-        setIsLoadingData(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching posts:', error);
-        setHasError(true);
-        setIsLoadingData(false);
-      });
+    const postsToRender = await getPostsPaginated(currentPage, POSTS_PER_PAGE);
+    setPosts(postsToRender);
+
+    setTotalPages(Math.ceil(lengthOfAllPosts / POSTS_PER_PAGE));
+
+    setIsLoadingData(false);
   };
 
   useEffect(() => {
-    getPostsFromApi();
-  }, []);
+    getPostsFromApi(currentPage);
+  }, [currentPage]);
 
   const handleCreatePost = async (title: string, text: string, image: File | null) => {
     try {
@@ -72,11 +71,20 @@ export default function Feed() {
 
       <div className="is-flex is-justify-content-space-between">
         {user && (
-          <button className="button is-primary mb-4" onClick={() => setIsModalOpen(true)}>
+          <button className="button is-primary mb-4 mr-4" onClick={() => setIsModalOpen(true)}>
             Create Post
           </button>
         )}
-        <Searchbar onSearch={handleSearchPosts} />
+        {!isLoadingData && (
+          <>
+            <div className="wrapper mr-4">
+              <PaginationBar currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            </div>
+          </>
+        )}
+        <div className="is-flex is-justify-content-flex-end">
+          <Searchbar onSearch={handleSearchPosts} />
+        </div>
       </div>
 
       <CreatePostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreatePost} />

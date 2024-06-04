@@ -14,10 +14,13 @@ function getAuthToken(): string | null {
   return localStorage.getItem('accessToken');
 }
 
-export async function getPosts(): Promise<Post[]> {
-  return wait(0)
-    .then(() => fetch(`${API_URL}/posts`))
-    .then((response) => response.json());
+export async function getAllPostsLength(): Promise<number> {
+  const allPosts = await wait(0).then(() => fetch(`${API_URL}/posts`).then((response) => response.json()));
+  return allPosts.length;
+}
+
+export async function getPostsPaginated(page: number = 1, limit: number = 10): Promise<Post[]> {
+  return wait(0).then(() => fetch(`${API_URL}/posts?page=${page}&limit=${limit}`).then((response) => response.json()));
 }
 
 export async function getPostsByUser(userId: string): Promise<Post[]> {
