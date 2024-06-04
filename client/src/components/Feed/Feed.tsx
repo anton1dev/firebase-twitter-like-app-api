@@ -6,14 +6,17 @@ import { Loader } from '../Loader';
 import { CreatePostModal } from '../CreatePostModal/CreatePostModal';
 import { Searchbar } from '../Searchbar/Searchbar';
 import { useAppSelector } from '../../app/hooks';
+import { POSTS_PER_PAGE } from '../../config/variables';
 
 export default function Feed() {
   const [hasError, setHasError] = useState<boolean>(false);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
   const [posts, setPosts] = useState<PostInterface[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { user } = useAppSelector((state) => state.user);
+  const totalPages = Math.ceil((posts.length + 1) / POSTS_PER_PAGE);
 
   const getPostsFromApi = async () => {
     await getPosts()
