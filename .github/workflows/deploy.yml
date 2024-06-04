@@ -28,7 +28,7 @@ jobs:
         run: cd functions && npm run build
 
       - name: Login to Firebase
-        run: firebase login:ci --token ${{ secrets.FIREBASE_TOKEN }}
+        run: cd functions && firebase login:ci --token ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Deploy to Firebase
         run: cd functions && firebase login --reauth && firebase deploy --only functions
