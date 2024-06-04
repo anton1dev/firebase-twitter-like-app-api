@@ -1,6 +1,8 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -11,10 +13,10 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_APP_ID,
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-} else {
-  firebase.app();
-}
+const app = firebase.initializeApp(firebaseConfig);
 
+const storage = getStorage(app);
+const firestore = getFirestore(app);
+
+export { storage, firestore };
 export default firebase;

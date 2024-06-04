@@ -1,9 +1,11 @@
 import { FormEvent, useState } from 'react';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../firebase/config';
 
 interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (title: string, text: string, image: File | null) => void;
+  onSubmit: (title: string, text: string, image?: string) => void;
 }
 
 export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -13,11 +15,26 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSubmit(title, text, image);
-    setTitle('');
-    setText('');
-    setImage(null);
-    onClose();
+
+    try {
+      let mediaUrl = '';
+
+      if (image) {
+        const imageRef = ref(storage, `images/${image.name}`);
+        await uploadBytes(imageRef, image);
+        mediaUrl = await getDownloadURL(imageRef);
+      }
+
+      onSubmit(title, text, mediaUrl);
+      console.log(mediaUrl);
+
+      setTitle('');
+      setText('');
+      setImage(null);
+      onClose();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

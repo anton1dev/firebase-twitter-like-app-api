@@ -28,6 +28,12 @@ export const userSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
+
+    setUserPhoto: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.photo = action.payload;
+      }
+    },
   },
 });
 

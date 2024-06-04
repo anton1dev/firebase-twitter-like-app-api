@@ -17,4 +17,7 @@ export class CreateUserDto {
 
   @MinLength(2)
   surname: string;
+
+  @IsString()
+  photo?: string;
 }

@@ -3,5 +3,5 @@ export interface CreatePost {
 
   title: string;
 
-  image?: File | null;
+  mediaUrl?: string;
 }

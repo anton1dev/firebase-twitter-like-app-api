@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { giveDislike, giveLike, updatePost } from '../../lib/posts';
 import { Post as PostInterface } from '../../interfaces/Post';
 import { useAppSelector } from '../../app/hooks';
+import { STANDARD_AVATAR_LINK } from '../../config/variables';
 
 interface PostProps {
   post: PostInterface;
@@ -12,7 +13,8 @@ export const Post = ({ post, onDelete }: PostProps) => {
   const { user } = useAppSelector((state) => state.user);
 
   const [currentPost, setCurrentPost] = useState(post);
-  const { text, title, authorNickname, commentsScore, likesScore, likes, dislikes, id, authorId } = currentPost;
+  const { text, title, authorNickname, commentsScore, likesScore, likes, dislikes, id, authorId, mediaUrl } =
+    currentPost;
   const [likesCount, setLikesCount] = useState<number>(likesScore);
   const [commentsCount] = useState<number>(commentsScore);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -98,7 +100,7 @@ export const Post = ({ post, onDelete }: PostProps) => {
       <article className="media">
         <figure className="media-left">
           <p className="image is-64x64">
-            <img className="is-rounded" src="https://bulma.io/assets/images/placeholders/128x128.png" />
+            <img className="is-rounded" src={user?.photo ? user.photo : STANDARD_AVATAR_LINK} />
           </p>
         </figure>
         <div className="media-content is-flex is-flex-direction-column">
@@ -147,6 +149,7 @@ export const Post = ({ post, onDelete }: PostProps) => {
                 <span className="has-text-weight-bold">{title}</span>
                 <br />
                 {text}
+                {mediaUrl && <img className="image is-128x128 is-4by3" src={mediaUrl}></img>}
               </p>
             )}
           </div>

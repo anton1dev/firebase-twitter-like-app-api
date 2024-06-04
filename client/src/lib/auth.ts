@@ -4,8 +4,9 @@ import firebase from '../firebase/config';
 import { User } from '../interfaces/User';
 import { NewUser } from '../interfaces/NewUser';
 import { DEFAULT_PASSWORD } from '../config/variables';
+import { getUserInfo } from './user';
 
-const API_URL = 'https://us-central1-fir-twitter-like-app.cloudfunctions.net/api';
+export const API_URL = 'https://us-central1-fir-twitter-like-app.cloudfunctions.net/api';
 const ACCESS_TOKEN_KEY = 'accessToken';
 
 axios.interceptors.request.use(
@@ -21,7 +22,7 @@ axios.interceptors.request.use(
   },
 );
 
-function getAccessToken() {
+export function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_KEY) ?? undefined;
 }
 
@@ -154,42 +155,6 @@ export async function logout() {
     return response;
   } catch (error) {
     console.error('Error during logout:', error);
-    return null;
-  }
-}
-
-export function getUser() {
-  const token = getAccessToken();
-  if (!token) {
-    return null;
-  }
-
-  return getUserInfo();
-}
-
-export async function deleteUser() {
-  const token = getAccessToken();
-  if (!token) {
-    return null;
-  }
-
-  await logout();
-
-  await axios.delete(`${API_URL}/auth/profile/delete`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-}
-
-async function getUserInfo() {
-  try {
-    const response = await axios.get(`${API_URL}/auth/profile`);
-    const user = response.data;
-
-    return user;
-  } catch (error) {
-    console.error(error);
     return null;
   }
 }

@@ -6,22 +6,26 @@ import { Post } from '../Post/Post';
 import { Loader } from '../Loader';
 import { CreatePostModal } from '../CreatePostModal/CreatePostModal';
 import { Searchbar } from '../Searchbar/Searchbar';
-import { useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { POSTS_PER_PAGE } from '../../config/variables';
 import PaginationBar from '../PaginationBar/PaginationBar';
+import { actions as userActions } from '../../features/user/userSlice';
 
 export default function Feed() {
+  const dispatch = useAppDispatch();
+
   const [hasError, setHasError] = useState<boolean>(false);
-  const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
   const [posts, setPosts] = useState<PostInterface[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [_feedLength, setFeedLength] = useState(1);
 
-  const { user } = useAppSelector((state) => state.user);
+  const { user, isLoading } = useAppSelector((state) => state.user);
 
   const getPostsFromApi = async (currentPage: number) => {
+    dispatch(userActions.setLoading(true));
+
     const lengthOfAllPosts = await getAllPostsLength();
     setFeedLength(lengthOfAllPosts);
 
@@ -30,20 +34,20 @@ export default function Feed() {
 
     setTotalPages(Math.ceil(lengthOfAllPosts / POSTS_PER_PAGE));
 
-    setIsLoadingData(false);
+    dispatch(userActions.setLoading(false));
   };
 
   useEffect(() => {
     getPostsFromApi(currentPage);
   }, [currentPage]);
 
-  const handleCreatePost = async (title: string, text: string, image: File | null) => {
+  const handleCreatePost = async (title: string, text: string, mediaUrl?: string) => {
     try {
-      setIsLoadingData(true);
-      const newPost = await createPost({ title, text, image });
+      dispatch(userActions.setLoading(true));
+      const newPost = await createPost({ title, text, mediaUrl });
       setPosts([...posts, newPost]);
       await getPostsFromApi(currentPage);
-      setIsLoadingData(false);
+      dispatch(userActions.setLoading(false));
     } catch (error) {
       console.error('Error creating post:', error);
       setHasError(true);
@@ -51,10 +55,10 @@ export default function Feed() {
   };
 
   const handleSearchPosts = (posts: PostInterface[]) => {
-    setIsLoadingData(true);
+    dispatch(userActions.setLoading(true));
     setTimeout(() => {
       setPosts(posts);
-      setIsLoadingData(false);
+      dispatch(userActions.setLoading(false));
     }, 100);
   };
 
@@ -76,7 +80,7 @@ export default function Feed() {
             Create Post
           </button>
         )}
-        {!isLoadingData && (
+        {!isLoading && (
           <>
             <div className="wrapper mr-4">
               <PaginationBar currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
@@ -94,7 +98,7 @@ export default function Feed() {
         <div className="columns is-quarter is-desktop is-centred">
           <div className="column">
             <div>
-              {isLoadingData ? (
+              {isLoading ? (
                 <Loader />
               ) : hasError ? (
                 <p>Error loading posts.</p>
