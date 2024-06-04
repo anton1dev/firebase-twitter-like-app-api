@@ -3,6 +3,8 @@ import { giveDislike, giveLike, updatePost } from '../../lib/posts';
 import { Post as PostInterface } from '../../interfaces/Post';
 import { useAppSelector } from '../../app/hooks';
 import { STANDARD_AVATAR_LINK } from '../../config/variables';
+import { addComment, getCommentsByPostId } from '../../lib/comments';
+import { Comment } from '../../interfaces/Comment';
 
 interface PostProps {
   post: PostInterface;
@@ -16,12 +18,16 @@ export const Post = ({ post, onDelete }: PostProps) => {
   const { text, title, authorNickname, commentsScore, likesScore, likes, dislikes, id, authorId, mediaUrl } =
     currentPost;
   const [likesCount, setLikesCount] = useState<number>(likesScore);
-  const [commentsCount] = useState<number>(commentsScore);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(user ? !!likes?.includes(user.id) : false);
   const [isDisliked, setIsDisliked] = useState<boolean>(user ? !!dislikes?.includes(user.id) : false);
   const [newTitle, setNewTitle] = useState(title);
   const [newText, setNewText] = useState(text);
+
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [commentCount, setCommentCount] = useState(commentsScore);
 
   const handleLike = async () => {
     try {
@@ -92,6 +98,35 @@ export const Post = ({ post, onDelete }: PostProps) => {
       setIsEditing(false);
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const response = await getCommentsByPostId(post.id);
+      setComments(response);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
+  const handleToggleComments = () => {
+    setShowComments((prev) => !prev);
+    if (!showComments) {
+      fetchComments();
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (newComment.trim() === '') return;
+
+    try {
+      await addComment(post.id, newComment, authorNickname);
+      setComments((prev) => [...prev, { text: newComment, postId: id, authorName: authorNickname }]);
+      setNewComment('');
+      setCommentCount((prev) => prev + 1);
+    } catch (error) {
+      console.error('Error adding comment:', error);
     }
   };
 
@@ -177,12 +212,12 @@ export const Post = ({ post, onDelete }: PostProps) => {
                   </span>
                 </div>
 
-                <a className="level-item">
+                <button className="level-item" onClick={handleToggleComments}>
                   <span className="icon is-small is-flex is-flex-direction-row mr-4">
                     <i className="fa-regular fa-comment"></i>
-                    <span className="ml-1">{commentsCount}</span>
+                    <span className="ml-1">{commentCount}</span>
                   </span>
-                </a>
+                </button>
               </div>
             </nav>
           )}
@@ -205,6 +240,31 @@ export const Post = ({ post, onDelete }: PostProps) => {
           )}
         </div>
       </article>
+
+      {showComments && (
+        <div className="comments-section">
+          <div className="comments-list">
+            {comments.map((comment, index) => (
+              <div key={comment.text} className="comment">
+                <p>
+                  <strong>{`Author #${index + 1}`}</strong>: {comment.text}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="new-comment">
+            <textarea
+              className="textarea mb-2"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+            ></textarea>
+            <button className="button is-link" onClick={handleAddComment}>
+              Add Comment
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

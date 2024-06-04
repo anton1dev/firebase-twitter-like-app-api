@@ -5,6 +5,7 @@ export interface Post {
   authorId: string;
   authorNickname: string;
   commentsScore: number;
+  commentaries: Comment[];
   likes?: string[];
   likesScore: number;
   dislikes?: string[];

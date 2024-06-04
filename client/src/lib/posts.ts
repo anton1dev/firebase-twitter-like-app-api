@@ -52,8 +52,6 @@ export async function giveDislike(postId: string): Promise<void> {
 export async function createPost(createPost: CreatePost): Promise<Post> {
   const token = getAuthToken();
 
-  console.log(createPost);
-
   return await axios.post(`${API_URL}/posts`, createPost, {
     headers: {
       Authorization: `Bearer ${token}`,

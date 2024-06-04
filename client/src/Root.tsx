@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage } from './components/HomePage/HomePage';
 import { App } from './App';
-// import { PeoplePage } from './components/PeoplePage/PeoplePage';
 import { NotFoundPage } from './components/NotFoundPage/NotFoundPage';
 import Feed from './components/Feed/Feed';
 import { LoginPage } from './components/LoginPage/LoginPage';
