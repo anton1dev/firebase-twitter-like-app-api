@@ -95,7 +95,15 @@ export class PostService {
       throw new ForbiddenException('This user cant update this post!');
     }
 
-    await this.postRepository.update(postId, updatePostDto);
+    const updatedPost = {
+      ...postToUpdate,
+      ...updatePostDto,
+      createdAt: postToUpdate.createdAt,
+    };
+
+    await this.postRepository.update(postId, {
+      ...updatedPost,
+    });
   }
 
   async deletePost(postId: string, user: UserDocument): Promise<void> {

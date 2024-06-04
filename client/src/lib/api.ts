@@ -2,8 +2,9 @@ import axios from 'axios';
 import { Post } from '../interfaces/Post';
 import { User } from '../interfaces/User';
 import { CreatePost } from '../interfaces/CreatePost';
+import { UpdatePost } from '../interfaces/UpdatePost';
 
-export const API_URL = 'https://us-central1-fir-twitter-like-app.cloudfunctions.net/api/';
+export const API_URL = 'http://localhost:3000/';
 
 export function wait(delay: number) {
   return new Promise((resolve) => setTimeout(resolve, delay));
@@ -65,6 +66,16 @@ export async function createPost(createPost: CreatePost): Promise<Post> {
   const token = getAuthToken();
 
   return await axios.post(`${API_URL}posts`, createPost, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function updatePost(id: string, updatedPost: UpdatePost) {
+  const token = getAuthToken();
+
+  return await axios.patch(`${API_URL}posts/${id}`, updatedPost, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

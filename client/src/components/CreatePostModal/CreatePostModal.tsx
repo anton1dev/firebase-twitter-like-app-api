@@ -31,6 +31,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
       <div className="modal-background" onClick={onClose}></div>
       <div className="modal-content">
         <div className="box">
+          <p className="title">Create a new post</p>
           <form onSubmit={handleSubmit}>
             <div className="field">
               <label className="label">Title</label>

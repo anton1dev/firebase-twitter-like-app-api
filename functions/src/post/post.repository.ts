@@ -77,7 +77,7 @@ export class PostRepository {
       ...updatePostDto,
     };
 
-    await this.postCollection.doc(postId).update(updatedPost);
+    await this.postCollection.doc(postId).update({ ...updatedPost });
   }
 
   async delete(postId: string): Promise<void> {

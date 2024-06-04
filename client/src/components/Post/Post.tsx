@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { giveDislike, giveLike } from '../../lib/api';
+import { giveDislike, giveLike, updatePost } from '../../lib/api';
 import { Post as PostInterface } from '../../interfaces/Post';
 import { useAppSelector } from '../../app/hooks';
 
@@ -11,11 +11,15 @@ interface PostProps {
 export const Post = ({ post, onDelete }: PostProps) => {
   const { user } = useAppSelector((state) => state.user);
 
-  const { text, title, authorNickname, commentsScore, likesScore, likes, dislikes, id, authorId } = post;
+  const [currentPost, setCurrentPost] = useState(post);
+  const { text, title, authorNickname, commentsScore, likesScore, likes, dislikes, id, authorId } = currentPost;
   const [likesCount, setLikesCount] = useState<number>(likesScore);
   const [commentsCount] = useState<number>(commentsScore);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(user ? !!likes?.includes(user.id) : false);
   const [isDisliked, setIsDisliked] = useState<boolean>(user ? !!dislikes?.includes(user.id) : false);
+  const [newTitle, setNewTitle] = useState(title);
+  const [newText, setNewText] = useState(text);
 
   const handleLike = async () => {
     try {
@@ -57,14 +61,33 @@ export const Post = ({ post, onDelete }: PostProps) => {
   };
 
   const handleEdit = () => {
-    // Логика для редактирования поста
+    setIsEditing(true);
+
     console.log('Edit post', id);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setNewTitle(title);
+    setNewText(text);
   };
 
   const handleDelete = async () => {
     try {
       await onDelete(id);
       console.log('Delete post', id);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const updatedPost = { ...currentPost, title: newTitle, text: newText };
+      setCurrentPost(updatedPost);
+
+      await updatePost(id, updatedPost);
+      setIsEditing(false);
     } catch (err) {
       console.log(err);
     }
@@ -80,57 +103,97 @@ export const Post = ({ post, onDelete }: PostProps) => {
         </figure>
         <div className="media-content is-flex is-flex-direction-column">
           <div className="content">
-            <p>
-              <a className="has-text-weight-semibold has-text-important">{authorNickname}</a>{' '}
-              <small>{`@${authorNickname}`}</small>
-              <br />
-              <span className="has-text-weight-bold">{title}</span>
-              <br />
-              {text}
-            </p>
+            {isEditing ? (
+              <div>
+                <div className="field">
+                  <label className="label">Title</label>
+                  <div className="control">
+                    <input
+                      className="input"
+                      type="text"
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="field">
+                  <label className="label">Text</label>
+                  <div className="control">
+                    <textarea
+                      className="textarea"
+                      value={newText}
+                      onChange={(e) => setNewText(e.target.value)}
+                    ></textarea>
+                  </div>
+                </div>
+                <div className="field is-grouped">
+                  <div className="control">
+                    <button className="button is-link" onClick={handleSave}>
+                      Save
+                    </button>
+                  </div>
+                  <div className="control">
+                    <button className="button is-light" onClick={handleCancel}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p>
+                <a className="has-text-weight-semibold has-text-important">{authorNickname}</a>{' '}
+                <small>{`@${authorNickname}`}</small>
+                <br />
+                <span className="has-text-weight-bold">{title}</span>
+                <br />
+                {text}
+              </p>
+            )}
           </div>
-          <nav className="level ml-2">
-            <div className="level-left is-flex is-align-items-center">
-              <div className="level-item">
-                <span className="icon is-small is-flex is-flex-direction-row ">
-                  <i
-                    className="fas fa-regular fa-heart mr-1"
-                    onClick={user ? handleLike : undefined}
-                    style={user ? {} : { pointerEvents: 'none' }}
-                  ></i>
-                  <span className="">{likesCount}</span>
-                </span>
-              </div>
+          {!isEditing && (
+            <nav className="level ml-2">
+              <div className="level-left is-flex is-align-items-center">
+                <div className="level-item">
+                  <span className="icon is-small is-flex is-flex-direction-row ">
+                    <i
+                      className="fas fa-regular fa-heart mr-1"
+                      onClick={user ? handleLike : undefined}
+                      style={user ? {} : { pointerEvents: 'none' }}
+                    ></i>
+                    <span className="">{likesCount}</span>
+                  </span>
+                </div>
 
-              <div className="level-item">
-                <span className="icon is-small is-flex is-flex-direction-row mr-4">
-                  <i
-                    className={`fas ${isDisliked ? 'fa-solid' : 'fa-regular'} fa-heart-crack mr-1`}
-                    onClick={user ? handleDislike : undefined}
-                    style={user ? {} : { pointerEvents: 'none' }}
-                  ></i>
-                </span>
-              </div>
+                <div className="level-item">
+                  <span className="icon is-small is-flex is-flex-direction-row mr-4">
+                    <i
+                      className={`fas ${isDisliked ? 'fa-solid' : 'fa-regular'} fa-heart-crack mr-1`}
+                      onClick={user ? handleDislike : undefined}
+                      style={user ? {} : { pointerEvents: 'none' }}
+                    ></i>
+                  </span>
+                </div>
 
-              <a className="level-item">
-                <span className="icon is-small is-flex is-flex-direction-row mr-4">
-                  <i className="fa-regular fa-comment"></i>
-                  <span className="ml-1">{commentsCount}</span>
-                </span>
-              </a>
-            </div>
-          </nav>
+                <a className="level-item">
+                  <span className="icon is-small is-flex is-flex-direction-row mr-4">
+                    <i className="fa-regular fa-comment"></i>
+                    <span className="ml-1">{commentsCount}</span>
+                  </span>
+                </a>
+              </div>
+            </nav>
+          )}
         </div>
 
         <div className="media-right">
-          {user?.id === authorId && (
+          {user?.id === authorId && !isEditing && (
             <div className="buttons">
               <button className="button is-small" onClick={handleEdit}>
                 <span className="icon">
                   <i className="fas fa-edit"></i>
                 </span>
               </button>
-              <button className="button is-small is-danger" onClick={handleDelete}>
+              <button className="button is-small" onClick={handleDelete}>
                 <span className="icon">
                   <i className="fas fa-trash"></i>
                 </span>
