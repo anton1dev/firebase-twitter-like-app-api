@@ -4,7 +4,7 @@ import firebase from '../firebase/config';
 import { User } from '../interfaces/User';
 import { NewUser } from '../interfaces/NewUser';
 
-const API_URL = 'http://localhost:3000/';
+const API_URL = 'https://us-central1-fir-twitter-like-app.cloudfunctions.net/api';
 const ACCESS_TOKEN_KEY = 'accessToken';
 
 axios.interceptors.request.use(

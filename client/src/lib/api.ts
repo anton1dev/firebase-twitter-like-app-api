@@ -4,7 +4,7 @@ import { User } from '../interfaces/User';
 import { CreatePost } from '../interfaces/CreatePost';
 import { UpdatePost } from '../interfaces/UpdatePost';
 
-export const API_URL = 'http://localhost:3000/';
+export const API_URL = 'https://us-central1-fir-twitter-like-app.cloudfunctions.net/api';
 
 export function wait(delay: number) {
   return new Promise((resolve) => setTimeout(resolve, delay));
