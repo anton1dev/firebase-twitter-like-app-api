@@ -4,8 +4,7 @@ import { API_URL } from '../config/variables';
 import { UpdateUser } from '../interfaces/UpdateUser';
 
 export async function updateUserPhoto(userId: string, updatedUser: UpdateUser) {
-  const response = await axios.patch(`${API_URL}/users/${userId}`, updatedUser);
-  const updatedUserId = response.data.id;
+  await axios.patch(`${API_URL}/users/${userId}`, updatedUser);
 
   return getUserInfo();
 }
