@@ -70,8 +70,6 @@ export const Post = ({ post, onDelete }: PostProps) => {
 
   const handleEdit = () => {
     setIsEditing(true);
-
-    console.log('Edit post', id);
   };
 
   const handleCancel = () => {
@@ -83,9 +81,8 @@ export const Post = ({ post, onDelete }: PostProps) => {
   const handleDelete = async () => {
     try {
       await onDelete(id);
-      console.log('Delete post', id);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -97,7 +94,7 @@ export const Post = ({ post, onDelete }: PostProps) => {
       await updatePost(id, updatedPost);
       setIsEditing(false);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 

@@ -7,7 +7,6 @@ export async function updateUserPhoto(userId: string, updatedUser: UpdateUser) {
   const response = await axios.patch(`${API_URL}/users/${userId}`, updatedUser);
   const updatedUserId = response.data.id;
 
-  console.log('User photo updated:', updatedUserId);
   return getUserInfo();
 }
 

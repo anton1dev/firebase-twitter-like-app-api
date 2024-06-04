@@ -3,11 +3,8 @@ import axios from 'axios';
 import firebase from '../firebase/config';
 import { User } from '../interfaces/User';
 import { NewUser } from '../interfaces/NewUser';
-import { DEFAULT_PASSWORD } from '../config/variables';
+import { ACCESS_TOKEN_KEY, API_URL, DEFAULT_PASSWORD } from '../config/variables';
 import { getUserInfo } from './user';
-
-export const API_URL = 'https://us-central1-fir-twitter-like-app.cloudfunctions.net/api';
-const ACCESS_TOKEN_KEY = 'accessToken';
 
 axios.interceptors.request.use(
   (config) => {
@@ -43,7 +40,6 @@ export async function signup(newUserData: NewUser) {
 export async function googleSignup(newUserData: User) {
   try {
     const response = await axios.post(`${API_URL}/auth/googlesignup`, newUserData);
-    console.log('1234');
     const { token } = response.data;
     setAccessToken(token);
 

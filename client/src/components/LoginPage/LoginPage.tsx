@@ -21,7 +21,6 @@ export const LoginPage = () => {
     try {
       dispatch(userActions.setLoading(true));
       navigate('/feed');
-      console.log('entering');
       const user = await login(email, password);
 
       if (!user) {

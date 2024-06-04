@@ -26,14 +26,13 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
       }
 
       onSubmit(title, text, mediaUrl);
-      console.log(mediaUrl);
 
       setTitle('');
       setText('');
       setImage(null);
       onClose();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
