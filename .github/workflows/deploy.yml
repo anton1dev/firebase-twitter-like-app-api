@@ -19,15 +19,25 @@ jobs:
           node-version: "20"
 
       - name: Install Firebase CLI
-        run: cd functions && npm install -g firebase-tools
+        run: npm install -g firebase-tools
 
       - name: Install dependencies
-        run: cd functions && npm install
+        run: npm install
+        working-directory: ./functions
 
       - name: Build the app
-        run: cd functions && npm run build
+        run: npm run build
+        working-directory: ./functions
 
       - name: Deploy to Firebase
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: cd functions && firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }}
+          API_KEY: ${{ secrets.API_KEY }}
+          AUTH_DOMAIN: ${{ secrets.AUTH_DOMAIN }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          STORAGE_BUCKET: ${{ secrets.STORAGE_BUCKET }}
+          MESSAGING_SENDER_ID: ${{ secrets.MESSAGING_SENDER_ID }}
+          APP_ID: ${{ secrets.APP_ID }}
+          MEASUREMENT_ID: ${{ secrets.MEASUREMENT_ID }}
+        run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }}
+        working-directory: ./functions
