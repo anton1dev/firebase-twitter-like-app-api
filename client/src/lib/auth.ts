@@ -3,6 +3,7 @@ import axios from 'axios';
 import firebase from '../firebase/config';
 import { User } from '../interfaces/User';
 import { NewUser } from '../interfaces/NewUser';
+import { DEFAULT_PASSWORD } from '../config/variables';
 
 const API_URL = 'https://us-central1-fir-twitter-like-app.cloudfunctions.net/api';
 const ACCESS_TOKEN_KEY = 'accessToken';
@@ -98,7 +99,7 @@ export async function loginWithGoogle(): Promise<User | null> {
       name: user.displayName?.split(' ')[0],
       surname: user.displayName?.split(' ')[1],
       email: user.email,
-      password: '12345678',
+      password: DEFAULT_PASSWORD,
       posts: [],
     };
 

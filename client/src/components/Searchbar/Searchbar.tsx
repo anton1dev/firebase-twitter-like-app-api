@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Post as PostInterface } from '../../interfaces/Post';
-import { getPostsPaginated, getPostsByQuery } from '../../lib/api';
+import { getPostsPaginated, getPostsByQuery } from '../../lib/posts';
 
 interface SearchbarProps {
   onSearch: (searchedPosts: PostInterface[]) => void;

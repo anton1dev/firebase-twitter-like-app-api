@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .vscode
 
+# dotenv environment variable files
 .env
 
 # Editor directories and files
@@ -25,5 +26,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-./fir-twitter-like-app-firebase-adminsdk-a23v5-0188a429e5.json

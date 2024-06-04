@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { giveDislike, giveLike, updatePost } from '../../lib/api';
+import { giveDislike, giveLike, updatePost } from '../../lib/posts';
 import { Post as PostInterface } from '../../interfaces/Post';
 import { useAppSelector } from '../../app/hooks';
 

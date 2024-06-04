@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Post as PostInterface } from '../../interfaces/Post';
-import { createPost, deletePostById, getAllPostsLength, getPostsPaginated } from '../../lib/api';
+import { createPost } from '../../lib/posts';
+import { deletePostById, getAllPostsLength, getPostsPaginated } from '../../lib/posts';
 import { Post } from '../Post/Post';
 import { Loader } from '../Loader';
 import { CreatePostModal } from '../CreatePostModal/CreatePostModal';
@@ -69,9 +70,9 @@ export default function Feed() {
     <>
       <h1 className="title">Feed Page</h1>
 
-      <div className="is-flex is-justify-content-space-between">
+      <div className="is-flex is-justify-content-space-between mb-4">
         {user && (
-          <button className="button is-primary mb-4 mr-4" onClick={() => setIsModalOpen(true)}>
+          <button className="button is-primary mr-4" onClick={() => setIsModalOpen(true)}>
             Create Post
           </button>
         )}

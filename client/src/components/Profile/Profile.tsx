@@ -1,7 +1,7 @@
 import { MouseEventHandler, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Post as PostInterface } from '../../interfaces/Post';
-import { deletePostById, getPostsByUser } from '../../lib/api';
+import { deletePostById, getPostsByUser } from '../../lib/posts';
 import { Post } from '../Post/Post';
 import { Loader } from '../Loader';
 import { deleteUser } from '../../lib/auth';
