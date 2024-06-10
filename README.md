@@ -17,7 +17,7 @@ During development process, I've used several web-technologies:
 - `React.js`, `React Router`, several `React` hooks as well;
 - `Bulma`, easy to install & learn but so powerful UI lib for `React`;
 - `Firebase` and several services: `Firestore`, `Firestore Auth`, `Hosting`, `Functions` for deploying back-end, `Storage`;
-- `ESLint`, `Prettier`, `Husky` for best code-style.
+- `ESLint`, `Prettier`, `Husky` for best code-style practice.
 
 ## Description
 
